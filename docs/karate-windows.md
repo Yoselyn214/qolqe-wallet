@@ -121,5 +121,3 @@ aserción fallida en el reporte y consulta [defectos.md](defectos.md).
 | `bash` no se reconoce al usar `karate_local.py` | Ese script llama a `scripts/karate.sh`; para PowerShell sin Bash, usa los comandos de esta guía. |
 
 El flujo de Linux se mantiene en [guia-karate-recargas.md](guia-karate-recargas.md).
-Los comandos de esta guía se prepararon a partir de los scripts del repositorio;
-no se han ejecutado en un equipo Windows en esta sesión.
