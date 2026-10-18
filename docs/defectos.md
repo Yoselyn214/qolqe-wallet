@@ -1,24 +1,150 @@
 # Reporte de defectos
 
-## DEF-01: <título breve y descriptivo>
+En este documento explicamos los errores encontrados al probar Qolqe con Karate.
+Para el resumen del trabajo seleccionamos dos del módulo de recargas: el bono
+que no se entrega al recargar S/ 30 y la aceptación de una sexta recarga diaria.
+Conservamos sus identificadores DEF-03 y DEF-04 para mantener la relación con
+los demás documentos. También mantenemos los hallazgos adicionales registrados.
 
-| Campo | Valor |
+Los resultados corresponden a ejecuciones anteriores. Esta actualización organiza
+la evidencia y no representa una nueva ejecución ni una corrección de la aplicación.
+
+## Resultado de recargas que tomamos como referencia
+
+Ejecución registrada del **17 de octubre de 2026 (hora de Lima)**, con Karate
+2.0.0 y una API dedicada con base temporal:
+
+```bash
+python scripts/karate_local.py --tags @recargas
+```
+
+```text
+scenarios: 71 | passed: 64 | 7 failed
+```
+
+| Defecto | Casos fallidos | Relación con el trabajo |
+|---|---|---|
+| DEF-03: falta el bono para S/ 30 | 2 | Defecto seleccionado: recarga manual y programada. |
+| DEF-04: se acepta la sexta recarga | 4 | Defecto seleccionado: límite diario en distintas combinaciones. |
+| DEF-05: reanudar supera tres activas | 1 | Hallazgo adicional de la suite ampliada. |
+
+Los registros anteriores de 29 y 34 casos corresponden a versiones más pequeñas
+de la suite. Usamos aquí el resultado ampliado para no mezclar cifras de distintas
+ejecuciones. Los siete casos fallidos representan tres defectos, porque varios
+casos pueden detectar el mismo problema.
+
+## DEF-03: una recarga de S/ 30 no recibe el bono
+
+| Campo | Detalle |
 |---|---|
-| Módulo / regla | |
-| Severidad | Crítica / Alta / Media / Baja |
-| Prioridad | Alta / Media / Baja |
-| Entorno | Versión de la app, navegador, SO |
-| Prueba que lo detecta | `tests/...::test_...` |
+| Módulo / regla | Recargas / R-G1-02 |
+| Severidad y prioridad | Alta / Alta |
+| Entorno registrado | API 1.0.0, Karate 2.0.0, API aislada con base temporal. |
+| Casos que lo detectan | «Bono desde S/ 30 con tope de S/ 4 para monto 30» y «Programada por S/ 30 aplica bono y registra origen e historial», en `api.feature`. |
 
-**Pasos para reproducir**
-1.
-2.
+### Cómo reproducirlo
 
-**Resultado esperado:**
+1. Restaurar los datos con `POST /api/pruebas/reiniciar` en una API de pruebas.
+2. Iniciar sesión como Ana con `POST /api/auth/login`, usando celular `987654321` y PIN `4826`.
+3. Guardar el token y enviarlo como `Authorization: Bearer <token>`.
+4. Enviar `POST /api/recargas` con este cuerpo:
 
-**Resultado obtenido:**
+```json
+{"celular":"999999999","monto":30}
+```
 
-**Evidencia:** captura, solicitud/respuesta o log
+**Esperábamos:** HTTP `201` y bono `1.50`, porque el 5 % de S/ 30 es S/ 1.50.
+
+**Observamos:** HTTP `201` y bono `0.00`. La recarga se realiza, pero no entrega
+el beneficio. El mismo problema aparece al ejecutar una programada de S/ 30.
+
+### Por qué ocurre y cómo lo detectamos
+
+En `qolqe/reglas/recargas.py`, la función `calcular_bono` usa:
+
+```python
+if monto > MONTO_MINIMO_BONO:
+```
+
+La comparación excluye el valor exacto de S/ 30. La regla indica «desde S/ 30»,
+por lo que debe incluir la igualdad (`>=`). Esta es la causa identificada al
+revisar el código; la aplicación no se modificó como parte de este reporte.
+
+El análisis de valores límite permitió detectar el problema justo donde comienza
+el beneficio. Usamos S/ 20 y S/ 50 como vecinos válidos, ya que 29 y 31 no son
+montos permitidos. En la ejecución ampliada fallaron dos casos por este defecto.
+
+## DEF-04: se acepta una sexta recarga diaria al mismo número
+
+| Campo | Detalle |
+|---|---|
+| Módulo / regla | Recargas / R-G1-03 |
+| Severidad y prioridad | Alta / Alta |
+| Entorno registrado | API 1.0.0, Karate 2.0.0, API aislada con base temporal. |
+| Caso principal | «Rechazar la sexta recarga manual sin descontar saldo», en `api.feature`. |
+| Variantes | Una programada más cuatro manuales; independencia entre números; programada después de cinco manuales. |
+
+### Cómo reproducirlo
+
+1. Restaurar los datos e iniciar sesión como Ana en una API dedicada a pruebas.
+2. Enviar cinco solicitudes `POST /api/recargas` con el siguiente cuerpo y el token de Ana:
+
+```json
+{"celular":"999999999","monto":5}
+```
+
+3. Enviar una sexta solicitud idéntica el mismo día.
+
+**Esperábamos:** HTTP `422` con código `LIMITE_RECARGAS`, sin nueva recarga ni
+descuento. La quinta sí debe aceptarse.
+
+**Observamos:** HTTP `201`; la sexta recarga se acepta y genera un descuento
+adicional. En la variante de cinco manuales seguidas de una programada se
+registró saldo `1470.00` en lugar de `1475.00`.
+
+También se reproduce con una programada ejecutada y cuatro manuales previas.
+Esa combinación suma cinco y es válida: el fallo ocurre al aceptar otra después.
+
+### Por qué ocurre y cómo lo detectamos
+
+En `qolqe/reglas/recargas.py`, la función `puede_recargar` usa:
+
+```python
+return not recargas_hoy_mismo_numero > MAX_RECARGAS_DIARIAS_MISMO_NUMERO
+```
+
+El conteo se hace antes de crear la nueva recarga. Si ya existen cinco, la
+expresión `not 5 > 5` devuelve verdadero y permite una sexta. La regla requiere
+permitir la operación solo si la cantidad existente es menor que cinco (`<`).
+
+Probamos la quinta y sexta solicitud mediante valores límite. En la ejecución
+ampliada, cuatro escenarios fallaron por este defecto. El caso «El límite
+alcanzado por un número no bloquea otro número» se detiene al intentar rechazar
+la sexta del primer número: **la comprobación final sobre el otro número no llega
+a ejecutarse**. Su fallo no demuestra que se estén mezclando los cupos.
+
+## Hallazgo adicional: DEF-05, reanudar permite superar tres activas
+
+| Campo | Detalle |
+|---|---|
+| Módulo / regla | Recargas / R-G1-04 |
+| Severidad y prioridad | Alta / Alta |
+| Caso | «Pausar libera un cupo pero reanudar no permite superar tres activas», en `api.feature`. |
+
+Para reproducirlo, restauramos los datos e iniciamos sesión como Ana. Partimos de
+una programada activa y otra pausada. Creamos dos activas, pausamos la activa
+inicial y creamos una más. Con tres activas, intentamos reanudar la pausada inicial.
+
+**Esperábamos:** `422 LIMITE_PROGRAMADAS`, conservando tres activas.
+
+**Observamos:** `200` con la programada reanudada en estado `ACTIVA`, superando
+el máximo. Este hallazgo corresponde al séptimo caso fallido de la ejecución
+ampliada y se mantiene separado de los dos defectos seleccionados para el resumen.
+
+## Hallazgo previo de autenticación
+
+El siguiente registro pertenece a otra ejecución y no forma parte del conteo de
+71 casos de recargas.
 
 ## DEF-02: El token sigue autorizando solicitudes después del logout
 
@@ -54,79 +180,13 @@ El reporte completo se genera en `reportes/karate/karate-summary.html` al ejecut
 `bash scripts/karate.sh`. La suite devuelve un código de salida distinto de cero
 mientras persista este defecto.
 
-## DEF-03: No se aplica bono a una recarga de S/ 30
+## Dónde revisar la evidencia
 
-| Campo | Valor |
-|---|---|
-| Módulo / regla | Recargas / R-G1-02 |
-| Severidad | Alta |
-| Prioridad | Alta |
-| Entorno | API 1.0.0, Karate 2.0.0, API aislada con base temporal |
-| Prueba que lo detecta | `api.feature`: Bono desde S/ 30 con tope de S/ 4 para monto 30 |
+El reporte HTML se genera en `reportes/karate/karate-summary.html`. Cada ejecución
+puede actualizarlo; comprueba que corresponda a la ejecución que estás revisando.
+Karate detiene cada escenario en su primera comprobación fallida, por lo que los
+pasos posteriores no se consideran verificados.
 
-**Pasos para reproducir:** Restaurar datos, iniciar sesión con Ana y enviar `POST /api/recargas` con `{"celular":"999999999","monto":30}`.
-
-**Resultado esperado:** `201` con bono `1.50`.
-
-**Resultado obtenido:** `201` con bono `0.00`.
-
-**Evidencia:** ejecución del 17 de octubre de 2026 (Lima),
-`python scripts/karate_local.py --tags @recargas`: 29 casos, 25 aprobados y 4 fallidos.
-Detalle HTTP en `reportes/karate/karate-summary.html`.
-
-## DEF-04: Se permite una sexta recarga diaria al mismo número
-
-| Campo | Valor |
-|---|---|
-| Módulo / regla | Recargas / R-G1-03 |
-| Severidad | Alta |
-| Prioridad | Alta |
-| Entorno | API 1.0.0, Karate 2.0.0, API aislada con base temporal |
-| Prueba que lo detecta | `api.feature`: Rechazar la sexta recarga manual sin descontar saldo; Una recarga programada cuenta junto a cuatro manuales |
-
-**Pasos para reproducir:** Restaurar datos e iniciar sesión con Ana. Realizar cinco recargas de S/ 5 al `999999999` y solicitar una sexta el mismo día. También se reproduce con una programada ejecutada y cuatro manuales previas.
-
-**Resultado esperado:** La sexta responde `422 LIMITE_RECARGAS`, sin descontar saldo.
-
-**Resultado obtenido:** La sexta responde `201`. Se reproduce tanto con recargas manuales como combinadas con una programada.
-
-**Evidencia:** ejecución del 17 de octubre de 2026 (Lima),
-`python scripts/karate_local.py --tags @recargas`: 29 casos, 25 aprobados y 4 fallidos.
-Detalle HTTP en `reportes/karate/karate-summary.html`.
-
-## DEF-05: Reanudar permite superar tres programadas activas
-
-| Campo | Valor |
-|---|---|
-| Módulo / regla | Recargas / R-G1-04 |
-| Severidad | Alta |
-| Prioridad | Alta |
-| Entorno | API 1.0.0, Karate 2.0.0, API aislada con base temporal |
-| Prueba que lo detecta | `api.feature`: Pausar libera un cupo pero reanudar no permite superar tres activas |
-
-**Pasos para reproducir:** Restaurar datos e iniciar sesión con Ana (una programada activa y una pausada). Crear dos activas, pausar la activa semilla y crear otra. Reanudar la pausada semilla.
-
-**Resultado esperado:** `422 LIMITE_PROGRAMADAS`; se mantienen tres activas.
-
-**Resultado obtenido:** `200` con la programada reanudada en estado `ACTIVA`, superando las tres activas.
-
-**Evidencia:** ejecución del 17 de octubre de 2026 (Lima),
-`python scripts/karate_local.py --tags @recargas`: 29 casos, 25 aprobados y 4 fallidos.
-Detalle HTTP en `reportes/karate/karate-summary.html`.
-
-## Actualización de evidencia: revisión de api.feature del 17 de octubre de 2026
-
-La nueva versión ejecuta **34 casos: 28 aprobados y 6 fallidos**, con
-`python scripts/karate_local.py --tags @recargas`.
-
-- DEF-03: sigue devolviendo bono `0.00` para S/ 30 (se espera `1.50`).
-- DEF-04: cuatro escenarios detectan el límite incorrecto: sexta manual,
-  programada seguida de manuales, independencia entre números (se detiene en el
-  rechazo esperado de la sexta), y programada después de cinco manuales.
-  Este último devuelve saldo `1470.00` en lugar de `1475.00`, incluso tras pausar
-  la programada semilla y desactivar el débito automático del servicio semilla.
-- DEF-05: reanudar responde `200` en lugar de `422 LIMITE_PROGRAMADAS`.
-
-Las comprobaciones posteriores al primer fallo de cada escenario no llegan a
-ejecutarse; el caso de independencia entre números aún no valida su última
-recarga debido a DEF-04.
+La [guía de Karate](guia-karate-recargas.md) explica cómo ejecutar las pruebas y
+leer el reporte. El [resumen de recargas](resumen-pruebas-recargas.md) presenta
+los casos, los valores límite y los dos defectos seleccionados.
