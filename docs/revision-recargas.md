@@ -86,7 +86,7 @@ Varios casos pueden detectar el mismo defecto. Además, cuando una comprobación
 falla, Karate no ejecuta los pasos restantes de ese escenario; no podemos darlos
 por verificados.
 
-LLa presentación del bono antes de confirmar, requerida por HU-G1-01 CA4, necesita una prueba de pantalla: por API solo comprobamos los
+La presentación del bono antes de confirmar, requerida por HU-G1-01 CA4, necesita una prueba de pantalla: por API solo comprobamos los
 parámetros de configuración. El redondeo general también requiere una prueba
 específica de la función, porque los montos permitidos no producen bonos con más
 de dos decimales.
