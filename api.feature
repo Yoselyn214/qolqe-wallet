@@ -26,6 +26,7 @@ Feature: Recargas de celular - G1
     Then status 200
     And match response.saldo == '1500.00'
 
+  @endpoint-post-recargas
   @HU-G1-01
   Scenario: Recargar S/ 10 y descontar el saldo
     Given path 'api/recargas'
@@ -48,6 +49,7 @@ Feature: Recargas de celular - G1
     Then status 200
     And match response.saldo == '1490.00'
 
+  @endpoint-post-recargas
   @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-VALID
   Scenario Outline: Recarga exitosa a un número válido por S/ <monto>
     Given path 'api/recargas'
@@ -66,6 +68,7 @@ Feature: Recargas de celular - G1
       | 999999999       | 50    | 50.00         |
       | 999999999       | 100   | 100.00        |
 
+  @endpoint-post-recargas
   @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-ERROR
   Scenario Outline: Rechazar celular <celular_destino> y monto <monto>
     Given path 'api/recargas'
@@ -91,6 +94,7 @@ Feature: Recargas de celular - G1
       | 999999999       | 50.5    | MONTO_NO_PERMITIDO |
       | 999999999       | cinco   | SOLICITUD_INVALIDA |
 
+  @endpoint-post-recargas
   @HU-G1-01 @HU-G1-01-CA2
   Scenario: Validar el monto descontado de la cuenta, el bono aplicado y el SMS
     Given path 'api/recargas'
@@ -113,6 +117,7 @@ Feature: Recargas de celular - G1
     And match response[0].mensaje contains '50.00'
     And match response[0].mensaje contains '2.50'
 
+  @endpoint-post-recargas
   @HU-G1-01 @R-G1-02
   Scenario Outline: Bono desde S/ 30 con tope de S/ 4 para monto <monto>
     Given path 'api/recargas'
@@ -130,6 +135,7 @@ Feature: Recargas de celular - G1
       | 50    | 2.50 |
       | 100   | 4.00 |
 
+  @endpoint-post-recargas
   @HU-G1-01 @R-G1-03
   Scenario: Rechazar la sexta recarga manual sin descontar saldo
     Given path 'api/recargas'
@@ -162,6 +168,7 @@ Feature: Recargas de celular - G1
     Then status 200
     And match response.saldo == '1475.00'
 
+  @endpoint-post-recargas
   @HU-G1-01 @R-G1-03
   Scenario: Una recarga programada cuenta junto a cuatro manuales
     Given path 'api/recargas/programadas'
@@ -209,6 +216,7 @@ Feature: Recargas de celular - G1
     Then status 422
     And match response.codigo == 'LIMITE_RECARGAS'
 
+  @endpoint-post-recargas
   @HU-G1-01 @R-G1-03
   Scenario: Permitir recargar al mismo número al día siguiente
     # Se asume que el reloj de pruebas interpreta estas horas en la zona de negocio.
@@ -258,6 +266,7 @@ Feature: Recargas de celular - G1
     When method post
     Then status 201
 
+  @endpoint-post-recargas-programadas
   @HU-G1-03 @R-G1-04
   Scenario: Aceptar tres activas y rechazar la cuarta sin contar las pausadas
     Given path 'api/recargas/programadas'
@@ -289,6 +298,7 @@ Feature: Recargas de celular - G1
     Then status 422
     And match response.codigo == 'LIMITE_PROGRAMADAS'
 
+  @endpoint-post-recargas-programadas-pausar @endpoint-post-recargas-programadas-reanudar
   @HU-G1-03 @R-G1-04
   @HU-G1-05
   Scenario: Pausar libera un cupo pero reanudar no permite superar tres activas
@@ -331,6 +341,7 @@ Feature: Recargas de celular - G1
     And match activasFinales == '#[3]'
     And match siguePausada == '#[1]'
 
+  @endpoint-post-recargas-programadas
   @HU-G1-03 @R-G1-05
   Scenario Outline: Validar el día de programación <dia>
     Given path 'api/recargas/programadas'
@@ -346,6 +357,7 @@ Feature: Recargas de celular - G1
       | 0   | 422    | { codigo: 'PROGRAMACION_INVALIDA' }   |
       | 29  | 422    | { codigo: 'PROGRAMACION_INVALIDA' }   |
 
+  @endpoint-post-recargas-programadas
   @HU-G1-03 @R-G1-05
   Scenario: Rechazar duplicados activos y pausados y permitir recrear tras eliminar
     Given path 'api/recargas/programadas'
@@ -375,6 +387,7 @@ Feature: Recargas de celular - G1
     When method post
     Then status 201
 
+  @endpoint-post-recargas-programadas
   @HU-G1-03 @R-G1-05
   Scenario: Permitir mismo celular con otro día y otro celular con el mismo día
     Given path 'api/recargas/programadas'
@@ -404,6 +417,7 @@ Feature: Recargas de celular - G1
     When method post
     Then status 201
 
+  @endpoint-post-recargas
   @HU-G1-01 @R-G1-03
   Scenario: El límite alcanzado por un número no bloquea otro número
     Given path 'api/recargas'
@@ -441,6 +455,7 @@ Feature: Recargas de celular - G1
     Then status 200
     And match response.saldo == '1470.00'
 
+  @endpoint-post-recargas
   @HU-G1-01 @R-G1-03
   @HU-G1-07 @HU-G1-07-CA3
   Scenario: Una programada no puede superar cinco recargas manuales del mismo día
@@ -538,6 +553,7 @@ Feature: Recargas de celular - G1
     And match response[0].mensaje contains 'máximo'
 
 
+  @endpoint-post-recargas
   @HU-G1-01 @HU-G1-01-CA3
   Scenario: Saldo insuficiente no registra recarga ni descuenta dinero
     Given path 'api/pruebas/saldo'
@@ -562,6 +578,7 @@ Feature: Recargas de celular - G1
     Then status 200
     And match response == antes
 
+  @endpoint-post-recargas
   @HU-G1-01 @HU-G1-01-CA3
   Scenario: Saldo exacto permite recargar y termina en cero
     Given path 'api/pruebas/saldo'
@@ -578,6 +595,7 @@ Feature: Recargas de celular - G1
     Then status 200
     And match response.saldo == '0.00'
 
+  @endpoint-get-recargas-configuracion
   @HU-G1-01 @configuracion
   Scenario: Configuración publica montos y parámetros del bono según requisitos
     Given path 'api/recargas/configuracion'
@@ -587,6 +605,7 @@ Feature: Recargas de celular - G1
     And match response.bono == { monto_minimo: '30', porcentaje: '5', tope: '4.00' }
     And match response.max_recargas_diarias_mismo_numero == 5
 
+  @endpoint-get-recargas
   @HU-G1-02
   Scenario: Historial devuelve las últimas veinte recargas con campos y orden correctos
     * def creadas = []
@@ -788,6 +807,7 @@ Feature: Recargas de celular - G1
     * def codigos = karate.map(creadas, x => x.codigo_operacion)
     And assert codigos.every((x, i) => codigos.indexOf(x) == i)
 
+  @endpoint-post-recargas-programadas
   @HU-G1-03 @HU-G1-03-CA1
   Scenario: Alias omitido es opcional
     Given path 'api/recargas/programadas'
@@ -796,6 +816,7 @@ Feature: Recargas de celular - G1
     Then status 201
     And match response.alias == '##null'
 
+  @endpoint-post-recargas-programadas
   @HU-G1-03 @HU-G1-03-CA1
   Scenario: Alias de veinte caracteres es válido
     Given path 'api/recargas/programadas'
@@ -804,6 +825,7 @@ Feature: Recargas de celular - G1
     Then status 201
     And match response.alias == '12345678901234567890'
 
+  @endpoint-post-recargas-programadas
   @HU-G1-03 @HU-G1-03-CA1
   Scenario: Alias de veintiún caracteres se rechaza
     Given path 'api/recargas/programadas'
@@ -812,6 +834,7 @@ Feature: Recargas de celular - G1
     Then status 422
     And match response.codigo == 'PROGRAMACION_INVALIDA'
 
+  @endpoint-post-recargas-programadas
   @HU-G1-03 @HU-G1-03-CA1
   Scenario: Celular inválido al programar
     Given path 'api/recargas/programadas'
@@ -820,6 +843,7 @@ Feature: Recargas de celular - G1
     Then status 422
     And match response.codigo == 'PROGRAMACION_INVALIDA'
 
+  @endpoint-post-recargas-programadas
   @HU-G1-03 @HU-G1-03-CA1
   Scenario: Monto no permitido al programar
     Given path 'api/recargas/programadas'
@@ -828,6 +852,7 @@ Feature: Recargas de celular - G1
     Then status 422
     And match response.codigo == 'PROGRAMACION_INVALIDA'
 
+  @endpoint-post-recargas-programadas
   @HU-G1-03 @HU-G1-03-CA2
   Scenario: Próxima ejecución desde 2026-01-10 para día 15
     Given path 'api/pruebas/reloj'
@@ -848,6 +873,7 @@ Feature: Recargas de celular - G1
     And match response.proxima_ejecucion == '2026-01-15'
     And match response.estado == 'ACTIVA'
 
+  @endpoint-post-recargas-programadas
   @HU-G1-03 @HU-G1-03-CA2
   Scenario: Próxima ejecución desde 2026-01-15 para día 15
     Given path 'api/pruebas/reloj'
@@ -868,6 +894,7 @@ Feature: Recargas de celular - G1
     And match response.proxima_ejecucion == '2026-02-15'
     And match response.estado == 'ACTIVA'
 
+  @endpoint-post-recargas-programadas
   @HU-G1-03 @HU-G1-03-CA2
   Scenario: Próxima ejecución desde 2026-01-20 para día 15
     Given path 'api/pruebas/reloj'
@@ -888,6 +915,7 @@ Feature: Recargas de celular - G1
     And match response.proxima_ejecucion == '2026-02-15'
     And match response.estado == 'ACTIVA'
 
+  @endpoint-post-recargas-programadas
   @HU-G1-03 @HU-G1-03-CA2
   Scenario: Próxima ejecución desde 2026-12-20 para día 15
     Given path 'api/pruebas/reloj'
@@ -908,6 +936,7 @@ Feature: Recargas de celular - G1
     And match response.proxima_ejecucion == '2027-01-15'
     And match response.estado == 'ACTIVA'
 
+  @endpoint-get-recargas-programadas
   @HU-G1-04
   Scenario: Listado muestra campos y resultado sin ejecuciones
     Given path 'api/recargas/programadas'
@@ -923,6 +952,7 @@ Feature: Recargas de celular - G1
     * def programada = encontrada[0]
     And match programada contains { celular: '999888777', alias: 'Prueba', monto: '10.00', dia: 15, estado: 'ACTIVA', proxima_ejecucion: '#string', ultimo_resultado: 'SIN_EJECUCIONES', ultimo_detalle: null, ultima_ejecucion_en: null, creada_en: '#string' }
 
+  @endpoint-put-recargas-programadas
   @HU-G1-05 @HU-G1-05-CA1
   Scenario: Editar monto alias y día recalcula fecha sin cambiar el celular
     Given path 'api/pruebas/reloj'
@@ -953,6 +983,7 @@ Feature: Recargas de celular - G1
     * def programada = encontrada[0]
     And match programada.alias == 'Nuevo'
 
+  @endpoint-put-recargas-programadas
   @HU-G1-05 @HU-G1-05-CA1
   Scenario: Edición inválida no modifica la programada { monto: 15 }
     Given path 'api/recargas/programadas'
@@ -974,6 +1005,7 @@ Feature: Recargas de celular - G1
     * def programada = encontrada[0]
     And match programada == original
 
+  @endpoint-put-recargas-programadas
   @HU-G1-05 @HU-G1-05-CA1
   Scenario: Edición inválida no modifica la programada { dia: 29 }
     Given path 'api/recargas/programadas'
@@ -995,6 +1027,7 @@ Feature: Recargas de celular - G1
     * def programada = encontrada[0]
     And match programada == original
 
+  @endpoint-put-recargas-programadas
   @HU-G1-05 @HU-G1-05-CA1
   Scenario: Edición inválida no modifica la programada { alias: '123456789012345678901' }
     Given path 'api/recargas/programadas'
@@ -1016,6 +1049,7 @@ Feature: Recargas de celular - G1
     * def programada = encontrada[0]
     And match programada == original
 
+  @endpoint-post-recargas-programadas-pausar
   @HU-G1-05 @HU-G1-05-CA3
   Scenario: Rechazar transición inválida pausar
     Given path 'api/recargas/programadas'
@@ -1033,6 +1067,7 @@ Feature: Recargas de celular - G1
     Then status 409
     And match response.codigo == 'ESTADO_INVALIDO'
 
+  @endpoint-post-recargas-programadas-reanudar
   @HU-G1-05 @HU-G1-05-CA3
   Scenario: Rechazar transición inválida reanudar
     Given path 'api/recargas/programadas'
@@ -1046,6 +1081,7 @@ Feature: Recargas de celular - G1
     Then status 409
     And match response.codigo == 'ESTADO_INVALIDO'
 
+  @endpoint-post-recargas-programadas-reanudar
   @HU-G1-05 @HU-G1-05-CA2
   Scenario: Pausada no se ejecuta y reanudar recalcula desde hoy
     Given path 'api/recargas/programadas'
@@ -1118,6 +1154,7 @@ Feature: Recargas de celular - G1
     Then status 200
     And match response contains { estado: 'ACTIVA', proxima_ejecucion: '2026-02-15' }
 
+  @endpoint-delete-recargas-programadas
   @HU-G1-06
   Scenario: Eliminar oculta la programada e impide futuras ejecuciones conservando historial
     Given path 'api/recargas/programadas'
@@ -1201,6 +1238,7 @@ Feature: Recargas de celular - G1
     * def restantes = karate.filter(response, x => x.celular == '999888777')
     And match restantes == historial
 
+  @endpoint-post-recargas-programadas
   @HU-G1-07 @HU-G1-07-CA1
   Scenario: No ejecutar programada antes de su fecha
     Given path 'api/recargas/programadas'
@@ -1265,6 +1303,7 @@ Feature: Recargas de celular - G1
     * def programada = encontrada[0]
     And match programada.ultimo_resultado == 'SIN_EJECUCIONES'
 
+  @endpoint-post-recargas-programadas
   @HU-G1-07 @HU-G1-07-CA2
   Scenario: Programada por S/ 30 aplica bono y registra origen e historial
     Given path 'api/recargas/programadas'
@@ -1330,6 +1369,7 @@ Feature: Recargas de celular - G1
     And match propias == '#[1]'
     And match propias[0] contains { monto: '30.00', bono: '1.50', origen: 'PROGRAMADA' }
 
+  @endpoint-post-recargas-programadas
   @HU-G1-07 @HU-G1-07-CA2
   Scenario: Programada por S/ 50 aplica bono y registra origen e historial
     Given path 'api/recargas/programadas'
@@ -1395,6 +1435,7 @@ Feature: Recargas de celular - G1
     And match propias == '#[1]'
     And match propias[0] contains { monto: '50.00', bono: '2.50', origen: 'PROGRAMADA' }
 
+  @endpoint-post-recargas-programadas
   @HU-G1-07 @HU-G1-07-CA2
   Scenario: Programada por S/ 100 aplica bono y registra origen e historial
     Given path 'api/recargas/programadas'
@@ -1460,6 +1501,7 @@ Feature: Recargas de celular - G1
     And match propias == '#[1]'
     And match propias[0] contains { monto: '100.00', bono: '4.00', origen: 'PROGRAMADA' }
 
+  @endpoint-post-recargas-programadas
   @HU-G1-07 @HU-G1-07-CA3 @HU-G1-07-CA4
   Scenario: Fallo por saldo insuficiente conserva saldo informa SMS y avanza fecha
     Given path 'api/recargas/programadas'
@@ -1538,6 +1580,7 @@ Feature: Recargas de celular - G1
     Then status 200
     And match response[0].mensaje contains 'Saldo insuficiente'
 
+  @endpoint-post-recargas-programadas
   @HU-G1-07 @HU-G1-07-CA4
   Scenario: Varios meses atrasados se ejecutan una sola vez y avanzan al próximo mes
     Given path 'api/recargas/programadas'
@@ -1602,6 +1645,7 @@ Feature: Recargas de celular - G1
     * def programada = encontrada[0]
     And match programada.proxima_ejecucion == '2026-05-15'
 
+  @endpoint-post-recargas-programadas
   @HU-G1-07 @HU-G1-07-CA5
   Scenario: Procesar dos veces el mismo día no duplica recargas
     Given path 'api/recargas/programadas'
@@ -1671,6 +1715,7 @@ Feature: Recargas de celular - G1
     Then status 200
     And match response.saldo == '1490.00'
 
+  @endpoint-get-recargas
   @seguridad-recargas
   Scenario: Sin sesión no se permite get 'api/recargas'
     * configure headers = {}
@@ -1679,6 +1724,7 @@ Feature: Recargas de celular - G1
     Then status 401
     And match response.codigo == 'NO_AUTENTICADO'
 
+  @endpoint-post-recargas
   @seguridad-recargas
   Scenario: Sin sesión no se permite post 'api/recargas'
     * configure headers = {}
@@ -1688,6 +1734,7 @@ Feature: Recargas de celular - G1
     Then status 401
     And match response.codigo == 'NO_AUTENTICADO'
 
+  @endpoint-get-recargas-programadas
   @seguridad-recargas
   Scenario: Sin sesión no se permite get 'api/recargas/programadas'
     * configure headers = {}
@@ -1696,6 +1743,7 @@ Feature: Recargas de celular - G1
     Then status 401
     And match response.codigo == 'NO_AUTENTICADO'
 
+  @endpoint-post-recargas-programadas
   @seguridad-recargas
   Scenario: Sin sesión no se permite post 'api/recargas/programadas'
     * configure headers = {}
@@ -1705,6 +1753,7 @@ Feature: Recargas de celular - G1
     Then status 401
     And match response.codigo == 'NO_AUTENTICADO'
 
+  @endpoint-put-recargas-programadas
   @seguridad-recargas
   Scenario: Otro usuario no puede editar una programada de Ana
     Given path 'api/recargas/programadas'
@@ -1724,6 +1773,7 @@ Feature: Recargas de celular - G1
     Then status 404
     And match response.codigo == 'PROGRAMADA_NO_ENCONTRADA'
 
+  @endpoint-post-recargas-programadas-pausar
   @seguridad-recargas
   Scenario: Otro usuario no puede pausar una programada de Ana
     Given path 'api/recargas/programadas'
@@ -1743,6 +1793,7 @@ Feature: Recargas de celular - G1
     Then status 404
     And match response.codigo == 'PROGRAMADA_NO_ENCONTRADA'
 
+  @endpoint-post-recargas-programadas-reanudar
   @seguridad-recargas
   Scenario: Otro usuario no puede reanudar una programada de Ana
     Given path 'api/recargas/programadas'
@@ -1762,6 +1813,7 @@ Feature: Recargas de celular - G1
     Then status 404
     And match response.codigo == 'PROGRAMADA_NO_ENCONTRADA'
 
+  @endpoint-delete-recargas-programadas
   @seguridad-recargas
   Scenario: Otro usuario no puede eliminar una programada de Ana
     Given path 'api/recargas/programadas'
