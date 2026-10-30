@@ -1,3 +1,7 @@
+> **Referencia histórica de la primera entrega.** La automatización activa está
+> en la [guía de Playwright y Schemathesis](guia-playwright-recargas.md).
+> Los resultados Karate de este documento no representan una ejecución de Playwright.
+
 # Ejecutar Karate en Windows con PowerShell
 
 Esta guía ejecuta los mismos archivos de pruebas del proyecto desde PowerShell,

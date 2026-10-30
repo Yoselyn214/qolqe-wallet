@@ -6,3 +6,11 @@ datos/
 .coverage
 htmlcov/
 reportes/
+.tools/
+
+node_modules/
+test-results/
+playwright-report/
+
+.schemathesis/
+.hypothesis/

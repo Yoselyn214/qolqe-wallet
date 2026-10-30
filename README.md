@@ -193,3 +193,28 @@ IA.md                     # Declaración de uso de IA
 ```
 
 En `docs/` encontrarán la especificación de requisitos, la plantilla del informe del proyecto y la plantilla del reporte de defectos; en la raíz, la plantilla de `IA.md`.
+
+## 7. Automatización G1 con Playwright y Schemathesis
+
+La segunda entrega usa **Playwright para API y E2E web**, **Page Object Model**,
+reportes **HTML/JUnit** y trazabilidad **HU → CP → pipeline**. Schemathesis ejecuta
+las pruebas de contrato en un trabajo independiente de GitHub Actions.
+
+Consulta la [guía de Playwright](docs/guia-playwright-recargas.md) para instalar y
+reproducir las pruebas, filtrar por regla y revisar las evidencias.
+
+```bash
+# Con el entorno Python activado:
+pip install -r requirements-dev.txt -r requirements-contract.txt
+npm ci
+npx playwright install chromium
+npm test
+npm run test:contract
+npm run report
+```
+
+Se migraron los 71 casos existentes manteniendo su orden e identificadores de
+reglas. Las pruebas web añaden cinco flujos con POM. Las suites levantan servidores
+exclusivos con bases temporales; no requieren iniciar uvicorn manualmente.
+Karate se conserva como referencia histórica y no se ejecuta en el pipeline activo.
+Los defectos conocidos siguen produciendo fallos visibles según los requisitos.

@@ -1,3 +1,7 @@
+> **Referencia histórica de la primera entrega.** La automatización activa está
+> en la [guía de Playwright y Schemathesis](guia-playwright-recargas.md).
+> Los resultados Karate de este documento no representan una ejecución de Playwright.
+
 # Resumen de pruebas de recargas con Karate
 
 ## Objetivo

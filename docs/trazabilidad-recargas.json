@@ -1,0 +1,654 @@
+[
+  {
+    "cp": "CP-G1-01",
+    "titulo": "Recargar S/ 10 y descontar el saldo",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01"
+    ]
+  },
+  {
+    "cp": "CP-G1-02",
+    "titulo": "Recarga exitosa a un número válido por S/ 5",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@R-G1-01",
+      "@HU-G1-01-CA1-VALID"
+    ]
+  },
+  {
+    "cp": "CP-G1-03",
+    "titulo": "Recarga exitosa a un número válido por S/ 10",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@R-G1-01",
+      "@HU-G1-01-CA1-VALID"
+    ]
+  },
+  {
+    "cp": "CP-G1-04",
+    "titulo": "Recarga exitosa a un número válido por S/ 20",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@R-G1-01",
+      "@HU-G1-01-CA1-VALID"
+    ]
+  },
+  {
+    "cp": "CP-G1-05",
+    "titulo": "Recarga exitosa a un número válido por S/ 30",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@R-G1-01",
+      "@HU-G1-01-CA1-VALID"
+    ]
+  },
+  {
+    "cp": "CP-G1-06",
+    "titulo": "Recarga exitosa a un número válido por S/ 50",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@R-G1-01",
+      "@HU-G1-01-CA1-VALID"
+    ]
+  },
+  {
+    "cp": "CP-G1-07",
+    "titulo": "Recarga exitosa a un número válido por S/ 100",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@R-G1-01",
+      "@HU-G1-01-CA1-VALID"
+    ]
+  },
+  {
+    "cp": "CP-G1-08",
+    "titulo": "Rechazar celular 899999999 y monto 50",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@R-G1-01",
+      "@HU-G1-01-CA1-ERROR"
+    ]
+  },
+  {
+    "cp": "CP-G1-09",
+    "titulo": "Rechazar celular 99999999 y monto 50",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@R-G1-01",
+      "@HU-G1-01-CA1-ERROR"
+    ]
+  },
+  {
+    "cp": "CP-G1-10",
+    "titulo": "Rechazar celular 999999999 y monto 0",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@R-G1-01",
+      "@HU-G1-01-CA1-ERROR"
+    ]
+  },
+  {
+    "cp": "CP-G1-11",
+    "titulo": "Rechazar celular 999999999 y monto 15",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@R-G1-01",
+      "@HU-G1-01-CA1-ERROR"
+    ]
+  },
+  {
+    "cp": "CP-G1-12",
+    "titulo": "Rechazar celular 999999999 y monto -15",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@R-G1-01",
+      "@HU-G1-01-CA1-ERROR"
+    ]
+  },
+  {
+    "cp": "CP-G1-13",
+    "titulo": "Rechazar celular 999999999 y monto 50.5",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@R-G1-01",
+      "@HU-G1-01-CA1-ERROR"
+    ]
+  },
+  {
+    "cp": "CP-G1-14",
+    "titulo": "Rechazar celular 999999999 y monto cinco",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@R-G1-01",
+      "@HU-G1-01-CA1-ERROR"
+    ]
+  },
+  {
+    "cp": "CP-G1-15",
+    "titulo": "Validar el monto descontado de la cuenta, el bono aplicado y el SMS",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@HU-G1-01-CA2"
+    ]
+  },
+  {
+    "cp": "CP-G1-16",
+    "titulo": "Bono desde S/ 30 con tope de S/ 4 para monto 5",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@R-G1-02"
+    ]
+  },
+  {
+    "cp": "CP-G1-17",
+    "titulo": "Bono desde S/ 30 con tope de S/ 4 para monto 10",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@R-G1-02"
+    ]
+  },
+  {
+    "cp": "CP-G1-18",
+    "titulo": "Bono desde S/ 30 con tope de S/ 4 para monto 20",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@R-G1-02"
+    ]
+  },
+  {
+    "cp": "CP-G1-19",
+    "titulo": "Bono desde S/ 30 con tope de S/ 4 para monto 30",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@R-G1-02"
+    ]
+  },
+  {
+    "cp": "CP-G1-20",
+    "titulo": "Bono desde S/ 30 con tope de S/ 4 para monto 50",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@R-G1-02"
+    ]
+  },
+  {
+    "cp": "CP-G1-21",
+    "titulo": "Bono desde S/ 30 con tope de S/ 4 para monto 100",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@R-G1-02"
+    ]
+  },
+  {
+    "cp": "CP-G1-22",
+    "titulo": "Rechazar la sexta recarga manual sin descontar saldo",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@R-G1-03"
+    ]
+  },
+  {
+    "cp": "CP-G1-23",
+    "titulo": "Una recarga programada cuenta junto a cuatro manuales",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@R-G1-03"
+    ]
+  },
+  {
+    "cp": "CP-G1-24",
+    "titulo": "Permitir recargar al mismo número al día siguiente",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@R-G1-03"
+    ]
+  },
+  {
+    "cp": "CP-G1-25",
+    "titulo": "Aceptar tres activas y rechazar la cuarta sin contar las pausadas",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-03",
+      "@R-G1-04"
+    ]
+  },
+  {
+    "cp": "CP-G1-26",
+    "titulo": "Pausar libera un cupo pero reanudar no permite superar tres activas",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-03",
+      "@R-G1-04",
+      "@HU-G1-05"
+    ]
+  },
+  {
+    "cp": "CP-G1-27",
+    "titulo": "Validar el día de programación 1",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-03",
+      "@R-G1-05"
+    ]
+  },
+  {
+    "cp": "CP-G1-28",
+    "titulo": "Validar el día de programación 28",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-03",
+      "@R-G1-05"
+    ]
+  },
+  {
+    "cp": "CP-G1-29",
+    "titulo": "Validar el día de programación 0",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-03",
+      "@R-G1-05"
+    ]
+  },
+  {
+    "cp": "CP-G1-30",
+    "titulo": "Validar el día de programación 29",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-03",
+      "@R-G1-05"
+    ]
+  },
+  {
+    "cp": "CP-G1-31",
+    "titulo": "Rechazar duplicados activos y pausados y permitir recrear tras eliminar",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-03",
+      "@R-G1-05"
+    ]
+  },
+  {
+    "cp": "CP-G1-32",
+    "titulo": "Permitir mismo celular con otro día y otro celular con el mismo día",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-03",
+      "@R-G1-05"
+    ]
+  },
+  {
+    "cp": "CP-G1-33",
+    "titulo": "El límite alcanzado por un número no bloquea otro número",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@R-G1-03"
+    ]
+  },
+  {
+    "cp": "CP-G1-34",
+    "titulo": "Una programada no puede superar cinco recargas manuales del mismo día",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@R-G1-03",
+      "@HU-G1-07",
+      "@HU-G1-07-CA3"
+    ]
+  },
+  {
+    "cp": "CP-G1-35",
+    "titulo": "Saldo insuficiente no registra recarga ni descuenta dinero",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@HU-G1-01-CA3"
+    ]
+  },
+  {
+    "cp": "CP-G1-36",
+    "titulo": "Saldo exacto permite recargar y termina en cero",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@HU-G1-01-CA3"
+    ]
+  },
+  {
+    "cp": "CP-G1-37",
+    "titulo": "Configuración publica montos y parámetros del bono según requisitos",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-01",
+      "@configuracion"
+    ]
+  },
+  {
+    "cp": "CP-G1-38",
+    "titulo": "Historial devuelve las últimas veinte recargas con campos y orden correctos",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-02"
+    ]
+  },
+  {
+    "cp": "CP-G1-39",
+    "titulo": "Alias omitido es opcional",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-03",
+      "@HU-G1-03-CA1"
+    ]
+  },
+  {
+    "cp": "CP-G1-40",
+    "titulo": "Alias de veinte caracteres es válido",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-03",
+      "@HU-G1-03-CA1"
+    ]
+  },
+  {
+    "cp": "CP-G1-41",
+    "titulo": "Alias de veintiún caracteres se rechaza",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-03",
+      "@HU-G1-03-CA1"
+    ]
+  },
+  {
+    "cp": "CP-G1-42",
+    "titulo": "Celular inválido al programar",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-03",
+      "@HU-G1-03-CA1"
+    ]
+  },
+  {
+    "cp": "CP-G1-43",
+    "titulo": "Monto no permitido al programar",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-03",
+      "@HU-G1-03-CA1"
+    ]
+  },
+  {
+    "cp": "CP-G1-44",
+    "titulo": "Próxima ejecución desde 2026-01-10 para día 15",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-03",
+      "@HU-G1-03-CA2"
+    ]
+  },
+  {
+    "cp": "CP-G1-45",
+    "titulo": "Próxima ejecución desde 2026-01-15 para día 15",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-03",
+      "@HU-G1-03-CA2"
+    ]
+  },
+  {
+    "cp": "CP-G1-46",
+    "titulo": "Próxima ejecución desde 2026-01-20 para día 15",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-03",
+      "@HU-G1-03-CA2"
+    ]
+  },
+  {
+    "cp": "CP-G1-47",
+    "titulo": "Próxima ejecución desde 2026-12-20 para día 15",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-03",
+      "@HU-G1-03-CA2"
+    ]
+  },
+  {
+    "cp": "CP-G1-48",
+    "titulo": "Listado muestra campos y resultado sin ejecuciones",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-04"
+    ]
+  },
+  {
+    "cp": "CP-G1-49",
+    "titulo": "Editar monto alias y día recalcula fecha sin cambiar el celular",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-05",
+      "@HU-G1-05-CA1"
+    ]
+  },
+  {
+    "cp": "CP-G1-50",
+    "titulo": "Edición inválida no modifica la programada { monto: 15 }",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-05",
+      "@HU-G1-05-CA1"
+    ]
+  },
+  {
+    "cp": "CP-G1-51",
+    "titulo": "Edición inválida no modifica la programada { dia: 29 }",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-05",
+      "@HU-G1-05-CA1"
+    ]
+  },
+  {
+    "cp": "CP-G1-52",
+    "titulo": "Edición inválida no modifica la programada { alias: '123456789012345678901' }",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-05",
+      "@HU-G1-05-CA1"
+    ]
+  },
+  {
+    "cp": "CP-G1-53",
+    "titulo": "Rechazar transición inválida pausar",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-05",
+      "@HU-G1-05-CA3"
+    ]
+  },
+  {
+    "cp": "CP-G1-54",
+    "titulo": "Rechazar transición inválida reanudar",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-05",
+      "@HU-G1-05-CA3"
+    ]
+  },
+  {
+    "cp": "CP-G1-55",
+    "titulo": "Pausada no se ejecuta y reanudar recalcula desde hoy",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-05",
+      "@HU-G1-05-CA2"
+    ]
+  },
+  {
+    "cp": "CP-G1-56",
+    "titulo": "Eliminar oculta la programada e impide futuras ejecuciones conservando historial",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-06"
+    ]
+  },
+  {
+    "cp": "CP-G1-57",
+    "titulo": "No ejecutar programada antes de su fecha",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-07",
+      "@HU-G1-07-CA1"
+    ]
+  },
+  {
+    "cp": "CP-G1-58",
+    "titulo": "Programada por S/ 30 aplica bono y registra origen e historial",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-07",
+      "@HU-G1-07-CA2"
+    ]
+  },
+  {
+    "cp": "CP-G1-59",
+    "titulo": "Programada por S/ 50 aplica bono y registra origen e historial",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-07",
+      "@HU-G1-07-CA2"
+    ]
+  },
+  {
+    "cp": "CP-G1-60",
+    "titulo": "Programada por S/ 100 aplica bono y registra origen e historial",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-07",
+      "@HU-G1-07-CA2"
+    ]
+  },
+  {
+    "cp": "CP-G1-61",
+    "titulo": "Fallo por saldo insuficiente conserva saldo informa SMS y avanza fecha",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-07",
+      "@HU-G1-07-CA3",
+      "@HU-G1-07-CA4"
+    ]
+  },
+  {
+    "cp": "CP-G1-62",
+    "titulo": "Varios meses atrasados se ejecutan una sola vez y avanzan al próximo mes",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-07",
+      "@HU-G1-07-CA4"
+    ]
+  },
+  {
+    "cp": "CP-G1-63",
+    "titulo": "Procesar dos veces el mismo día no duplica recargas",
+    "etiquetas": [
+      "@recargas",
+      "@HU-G1-07",
+      "@HU-G1-07-CA5"
+    ]
+  },
+  {
+    "cp": "CP-G1-64",
+    "titulo": "Sin sesión no se permite get 'api/recargas'",
+    "etiquetas": [
+      "@recargas",
+      "@seguridad-recargas",
+      "@HU-G1-01"
+    ]
+  },
+  {
+    "cp": "CP-G1-65",
+    "titulo": "Sin sesión no se permite post 'api/recargas'",
+    "etiquetas": [
+      "@recargas",
+      "@seguridad-recargas",
+      "@HU-G1-01"
+    ]
+  },
+  {
+    "cp": "CP-G1-66",
+    "titulo": "Sin sesión no se permite get 'api/recargas/programadas'",
+    "etiquetas": [
+      "@recargas",
+      "@seguridad-recargas",
+      "@HU-G1-04"
+    ]
+  },
+  {
+    "cp": "CP-G1-67",
+    "titulo": "Sin sesión no se permite post 'api/recargas/programadas'",
+    "etiquetas": [
+      "@recargas",
+      "@seguridad-recargas",
+      "@HU-G1-03"
+    ]
+  },
+  {
+    "cp": "CP-G1-68",
+    "titulo": "Otro usuario no puede editar una programada de Ana",
+    "etiquetas": [
+      "@recargas",
+      "@seguridad-recargas",
+      "@HU-G1-05"
+    ]
+  },
+  {
+    "cp": "CP-G1-69",
+    "titulo": "Otro usuario no puede pausar una programada de Ana",
+    "etiquetas": [
+      "@recargas",
+      "@seguridad-recargas",
+      "@HU-G1-05"
+    ]
+  },
+  {
+    "cp": "CP-G1-70",
+    "titulo": "Otro usuario no puede reanudar una programada de Ana",
+    "etiquetas": [
+      "@recargas",
+      "@seguridad-recargas",
+      "@HU-G1-05"
+    ]
+  },
+  {
+    "cp": "CP-G1-71",
+    "titulo": "Otro usuario no puede eliminar una programada de Ana",
+    "etiquetas": [
+      "@recargas",
+      "@seguridad-recargas",
+      "@HU-G1-06"
+    ]
+  }
+]
