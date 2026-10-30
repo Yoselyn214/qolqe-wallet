@@ -38,6 +38,7 @@ def main():
                 raise RuntimeError('La API de contrato no inició en 120 segundos')
             solicitar('/api/pruebas/reiniciar', {})
             token = solicitar('/api/auth/login', {'celular': '987654321', 'pin': '4826'})['access_token']
+            env = {**os.environ, 'PYTHONIOENCODING': 'utf-8', 'PYTHONUTF8': '1'}
             return subprocess.call([
                 str(Path(sys.executable).parent / ('schemathesis.exe' if os.name == 'nt' else 'schemathesis')),
                 'run', BASE + '/openapi.json',
@@ -45,7 +46,7 @@ def main():
                 '--header', 'Authorization: Bearer ' + token,
                 '--max-examples', '20', '--seed', '5383',
                 '--report', 'junit', '--report-junit-path', str(report / 'junit.xml'),
-            ], cwd=ROOT)
+            ], cwd=ROOT, env=env)
         finally:
             server.terminate()
             try:
