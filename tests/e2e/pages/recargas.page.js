@@ -2,6 +2,7 @@ const { expect } = require('@playwright/test');
 class RecargasPage {
   constructor(page) {
     this.page = page;
+    this.formulario = page.locator('#form-recarga');
     this.comprobante = page.getByTestId('comprobante');
     this.error = page.getByTestId('recarga-error');
     this.errorProgramada = page.getByTestId('programada-error');
@@ -11,6 +12,7 @@ class RecargasPage {
     this.monto = page.getByTestId('comprobante-monto');
     this.bono = page.getByTestId('comprobante-bono');
     this.saldo = page.getByTestId('comprobante-saldo');
+    this.fecha = page.getByTestId('comprobante-fecha');
   }
   async abrir() {
     await this.page.goto('/recargas');

@@ -2,6 +2,7 @@ const fs = require('node:fs');
 class TrazabilidadReporter {
   constructor() { this.results = []; }
   onTestEnd(test, result) {
+    if (test.parent.project()?.name === 'setup') return;
     this.results.push({
       proyecto: test.parent.project()?.name,
       cp: test.title.match(/CP-WEB-G1-\d+|CP-G1-\d+|CP-AUTH-\d+|CP-SALUD-\d+/)?.[0],

@@ -18,6 +18,9 @@ test('CP-WEB-G1-01 Recarga y comprobante @HU-G1-01 @R-G1-01 @R-G1-02', async () 
   await expect(recargas.saldo).toContainText('1,450.00');
   await expect(recargas.codigo).not.toBeEmpty();
   await expect(recargas.historial).toContainText('999888777');
+  await expect(recargas.comprobante).toHaveScreenshot('comprobante-recarga.png', {
+    mask: [recargas.codigo, recargas.fecha],
+  });
 });
 test('CP-WEB-G1-02 Celular inválido @HU-G1-01 @R-G1-01', async () => {
   await recargas.recargar('899888777', 10);
@@ -45,4 +48,7 @@ test('CP-WEB-G1-05 Día inválido @HU-G1-03 @R-G1-05', async () => {
   await recargas.programar('999888777', 10, 29, 'Día inválido');
   await expect(recargas.errorProgramada).toBeVisible();
   await expect(recargas.programada('Día inválido')).toHaveCount(0);
+});
+test('CP-WEB-G1-06 Regresión visual del formulario de recargas @HU-G1-01 @R-G1-01', async () => {
+  await expect(recargas.formulario).toHaveScreenshot('formulario-recarga.png');
 });
