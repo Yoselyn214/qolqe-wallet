@@ -7,7 +7,10 @@
     "test:api": "playwright test --project=api",
     "test:e2e": "playwright test --project=web",
     "test:contract": "python scripts/contrato.py",
+    "gate:api": "node scripts/quality_gate_api.js",
     "report": "playwright show-report reportes/playwright/html"
   },
-  "devDependencies": { "@playwright/test": "1.58.2" }
+  "devDependencies": {
+    "@playwright/test": "1.58.2"
+  }
 }

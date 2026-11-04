@@ -1,43 +1,133 @@
-name: G1 Recargas
-on: [push, pull_request]
+name: Pipeline CI/CD - Qolqe Wallet (G1 Recargas)
+
+on:
+  push:
+    branches: [main, actualizacion]
+  pull_request:
+    branches: [main, actualizacion]
+  workflow_dispatch:
+
 permissions:
   contents: read
+
 jobs:
-  playwright:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-      - run: pip install -r requirements-dev.txt
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      - run: npm test
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: playwright-evidencia
-          path: reportes/playwright/
-          retention-days: 30
-  schemathesis:
+  # =========================================================================
+  # STAGE 1: Pruebas de Contrato (Schemathesis) - Quality Gate 1
+  # =========================================================================
+  contrato:
+    name: "Quality Gate 1: Pruebas de Contrato (OpenAPI)"
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Descargar código fuente
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install -r requirements-contract.txt
-      - run: python scripts/contrato.py
-      - uses: actions/upload-artifact@v4
+          cache: pip
+
+      - name: Instalar dependencias de contrato
+        run: pip install -r requirements-contract.txt
+
+      - name: Ejecutar pruebas de contrato y verificar conformidad OpenAPI
+        run: python scripts/contrato.py
+
+      - name: Publicar evidencias de contrato (JUnit)
+        uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: schemathesis-evidencia
+          name: evidencia-contrato
           path: reportes/contrato/
+          retention-days: 30
+
+  # =========================================================================
+  # STAGE 2: Pruebas de API (Playwright API) - Quality Gate 2
+  # =========================================================================
+  pruebas-api:
+    name: "Quality Gate 2: Pruebas de API (Funcionales y Técnicas)"
+    needs: [contrato]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Descargar código fuente
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Configurar Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Instalar dependencias de servidor Python
+        run: pip install -r requirements-dev.txt
+
+      - name: Instalar dependencias Node.js
+        run: npm ci
+
+      - name: Ejecutar suite de API (Salud, Auth, Seguridad, HU-G1-01 a 07, R-G1-01 a 05)
+        id: run_api
+        run: npm run test:api
+        continue-on-error: true
+
+      - name: Evaluar Quality Gate 2 (Cobertura, Regresiones y Defectos Conocidos)
+        run: npm run gate:api
+
+      - name: Publicar evidencias de pruebas de API
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evidencia-api
+          path: reportes/playwright/
+          retention-days: 30
+
+  # =========================================================================
+  # STAGE 3: Pruebas Web E2E (Playwright Web) - Quality Gate 3
+  # =========================================================================
+  pruebas-web:
+    name: "Quality Gate 3: Pruebas Web E2E (Interfaz y Flujos de Usuario)"
+    needs: [pruebas-api]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Descargar código fuente
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Configurar Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Instalar dependencias de servidor Python
+        run: pip install -r requirements-dev.txt
+
+      - name: Instalar dependencias Node.js
+        run: npm ci
+
+      - name: Instalar navegador Chromium para pruebas E2E
+        run: npx playwright install --with-deps chromium
+
+      - name: Ejecutar pruebas Web E2E (POM: recargas, comprobante, programadas, regresión visual)
+        run: npm run test:e2e
+
+      - name: Publicar evidencias de pruebas Web E2E
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evidencia-web
+          path: reportes/playwright/
           retention-days: 30

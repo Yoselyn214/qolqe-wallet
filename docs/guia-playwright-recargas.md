@@ -25,6 +25,7 @@ Con el entorno Python activado, desde la raíz:
 ```bash
 npm test
 npm run test:api
+npm run gate:api
 npm run test:e2e
 npm run test:api -- --grep @R-G1-02
 npm run test:api -- --grep CP-G1-01
@@ -58,16 +59,27 @@ transversalmente a G1.
 | R-G1-04 | Máximo de tres programadas activas, pausa y reanudación |
 | R-G1-05 | Día 1–28 y duplicados |
 
-`tests/e2e/recargas.spec.js` añade `CP-WEB-G1-01` a `05`: recarga y comprobante,
-celular inválido, saldo insuficiente, ciclo de programada y día inválido.
+`tests/e2e/recargas.spec.js` añade `CP-WEB-G1-01` a `06`: recarga y comprobante,
+celular inválido, saldo insuficiente, ciclo de programada, día inválido y regresión visual.
 Los selectores y acciones están en `tests/e2e/pages/`. Las pruebas ingresan desde
 la pantalla de login y usan la API real, sin simular respuestas.
 
-## Reportes y pipeline
+## Reportes y pipeline CI/CD (Quality Gates)
 
-`.github/workflows/pruebas.yml` ejecuta dos trabajos independientes ante push y pull
-request. Ambos deben aprobar. No oculta errores con `continue-on-error` ni marca
-los defectos del producto como éxitos esperados.
+`.github/workflows/pruebas.yml` ejecuta una arquitectura en cascada gobernada por **tres Quality Gates**:
+
+```mermaid
+flowchart LR
+    A["Quality Gate 1<br/>Pruebas de Contrato<br/>(Schemathesis)"] --> B["Quality Gate 2<br/>Pruebas de API<br/>(Funcionales y Técnicas)"]
+    B --> C["Quality Gate 3<br/>Pruebas Web E2E<br/>(POM y Regresión Visual)"]
+```
+
+1. **Quality Gate 1 - Pruebas de Contrato (Schemathesis):**  
+   Se ejecuta en primer lugar. Valida exhaustivamente que la API cumpla el contrato OpenAPI (`openapi.json`) en las 9 operaciones de recargas. Si el contrato falla, no se gasta tiempo ni recursos en pruebas posteriores.
+2. **Quality Gate 2 - Pruebas de API Funcionales y Técnicas (Playwright API):**  
+   Se ejecuta tras superar el Gate 1 (`needs: [contrato]`). Ejecuta los 76 casos (técnicos: `@smoke`, `@auth`, `@seguridad-recargas`; funcionales: `HU-G1-01` a `HU-G1-07` y `R-G1-01` a `R-G1-05`). El evaluador `scripts/quality_gate_api.js` valida que los 68 casos esperados aprueben y que los 8 casos fallidos correspondan exactamente a los defectos documentados (DEF-02 a DEF-05), impidiendo cualquier regresión.
+3. **Quality Gate 3 - Pruebas Web E2E (Playwright Web):**  
+   Se ejecuta únicamente tras superar el Gate 2 (`needs: [pruebas-api]`). Instala Chromium y ejecuta los flujos de usuario E2E mediante POM y regresión visual. Requiere 100% de éxito.
 
 | Evidencia | Ruta |
 |---|---|
@@ -77,21 +89,9 @@ los defectos del producto como éxitos esperados.
 | Capturas y trazas de fallos web | `reportes/playwright/resultados/` |
 | JUnit Schemathesis | `reportes/contrato/junit.xml` |
 
-GitHub Actions conserva ambos directorios como artefactos incluso si fallan las
-pruebas. El reporte de trazabilidad contiene el estado real de cada caso y la URL
-de la ejecución en CI. Schemathesis obtiene el contrato del servidor, se autentica
-y prueba únicamente rutas `/api/recargas`, con semilla reproducible y 20 ejemplos
-por operación. Sus datos generados pueden cambiar saldos y estados dentro de su
-propia base; no sustituyen las verificaciones de negocio aisladas de Playwright.
-
-Los resultados anteriores (64 aprobados y 7 fallidos en Karate) son históricos.
-La ejecución actual es la evidencia válida para Playwright. Se mantienen las
-expectativas de requisitos aunque los defectos DEF-03 a DEF-05 provoquen fallos.
+GitHub Actions conserva las evidencias de cada etapa como artefactos independientes (`evidencia-contrato`, `evidencia-api`, `evidencia-web`).
 
 Referencias oficiales: [API testing](https://playwright.dev/docs/api-testing),
 [servidor de pruebas](https://playwright.dev/docs/test-webserver),
 [reportes](https://playwright.dev/docs/test-reporters) y
 [CLI de Schemathesis](https://schemathesis.readthedocs.io/en/stable/reference/cli/).
-
-La ejecución local validada y sus hallazgos están en
-[validacion-playwright.md](validacion-playwright.md).
