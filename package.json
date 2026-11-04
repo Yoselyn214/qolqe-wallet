@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "test": "playwright test",
-    "test:api": "playwright test --project=api",
-    "test:e2e": "playwright test --project=web",
+    "test:api": "playwright test tests/api/recargas.spec.js",
+    "test:e2e": "playwright test tests/e2e/recargas.spec.js",
     "test:contract": "python scripts/contrato.py",
     "gate:api": "node scripts/quality_gate_api.js",
     "report": "playwright show-report reportes/playwright/html"

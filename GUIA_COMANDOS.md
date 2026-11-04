@@ -130,7 +130,7 @@ schemathesis run http://127.0.0.1:8012/openapi.json `
 
 ## 4. Karate (Pruebas BDD / API - Referencia Histórica)
 
-Karate contiene la suite histórica de 71 escenarios de la primera entrega definidos en `api.feature`. Requiere Java 21+ y Karate standalone (`karate-2.0.0.jar`).
+Karate contiene la suite histórica de 71 escenarios de la primera entrega definidos en `features/api.feature`. Requiere Java 21+ y Karate standalone (`karate-2.0.0.jar`).
 
 ### 4.1. Preparación previa
 Descargar el JAR de Karate (solo una vez):
@@ -153,7 +153,7 @@ Desde la raíz del proyecto, inicializa las variables y posiciónate en `tests/k
 $raiz = (Get-Location).Path
 $jar = Join-Path $raiz ".tools\karate-2.0.0.jar"
 $reporte = Join-Path $raiz "reportes\karate"
-$feature = Join-Path $raiz "api.feature"
+$feature = Join-Path $raiz "features\api.feature"
 Set-Location (Join-Path $raiz "tests\karate")
 ```
 
@@ -183,5 +183,5 @@ Set-Location (Join-Path $raiz "tests\karate")
 | **Playwright** | Actualizar screenshots | `npx playwright test --update-snapshots` |
 | **Playwright** | Ver reporte HTML | `npm run report` |
 | **Schemathesis** | Pruebas de contrato (Quality Gate 1) | `npm run test:contract` |
-| **Karate** | Recargas API | `java -DbaseUrl=... -jar karate-2.0.0.jar run --threads 1 --tags @recargas . api.feature` |
+| **Karate** | Recargas API | `java -DbaseUrl=... -jar karate-2.0.0.jar run --threads 1 --tags @recargas . features/api.feature` |
 | **Karate** | Ver reporte | `Start-Process reportes/karate/karate-summary.html` |

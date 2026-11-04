@@ -16,4 +16,4 @@ fi
 # Un solo hilo: los escenarios de autenticación reinician datos compartidos.
 cd "$ROOT/tests/karate"
 exec java "-DbaseUrl=${BASE_URL:-http://127.0.0.1:8001}" -jar "$JAR" run \
-  --threads 1 --output "$ROOT/reportes/karate" "$@" . "$ROOT/api.feature"
+  --threads 1 --output "$ROOT/reportes/karate" "$@" . "$ROOT/features/api.feature"
