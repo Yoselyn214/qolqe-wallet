@@ -121,7 +121,7 @@ jobs:
       - name: Instalar navegador Chromium para pruebas E2E
         run: npx playwright install --with-deps chromium
 
-      - name: Ejecutar pruebas Web E2E (POM: recargas, comprobante, programadas, regresión visual)
+      - name: "Ejecutar pruebas Web E2E (POM: recargas, comprobante, programadas, regresión visual)"
         run: npm run test:e2e
 
       - name: Publicar evidencias de pruebas Web E2E
