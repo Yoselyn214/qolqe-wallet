@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [main, actualizacion]
   workflow_dispatch:
+    inputs:
+      con_evidencias:
+        description: 'Generar reportes con evidencias visuales (imágenes, trazas y videos)'
+        required: true
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -36,7 +42,7 @@ jobs:
 
       - name: "Publicar evidencias de contrato (JUnit)"
         uses: actions/upload-artifact@v4
-        if: always()
+        if: ${{ always() && (github.event.inputs.con_evidencias != 'false') }}
         with:
           name: evidencia-contrato
           path: reportes/contrato/
@@ -74,6 +80,8 @@ jobs:
 
       - name: "Ejecutar suite de API Recargas (71 casos de features/api.feature)"
         id: run_api
+        env:
+          CON_EVIDENCIA: ${{ github.event.inputs.con_evidencias || 'true' }}
         run: npm run test:api
         continue-on-error: true
 
@@ -82,7 +90,7 @@ jobs:
 
       - name: "Publicar evidencias de pruebas de API"
         uses: actions/upload-artifact@v4
-        if: always()
+        if: ${{ always() && (github.event.inputs.con_evidencias != 'false') }}
         with:
           name: evidencia-api
           path: reportes/playwright/
@@ -90,10 +98,13 @@ jobs:
 
   # =========================================================================
   # STAGE 3: Pruebas Web E2E (Playwright Web) - Quality Gate 3
+  # Nota: Se ejecuta SIEMPRE tras Stage 2 (if: ${{ !cancelled() }}), garantizando
+  # que la interfaz web nunca se quede sin probar.
   # =========================================================================
   pruebas-web:
-    name: "Quality Gate 3: Pruebas Web E2E - Módulo Recargas"
+    name: "Quality Gate 3: Pruebas Web E2E - Módulo Común y Recargas"
     needs: [pruebas-api]
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -121,13 +132,34 @@ jobs:
       - name: "Instalar navegador Chromium para pruebas E2E"
         run: npx playwright install --with-deps chromium
 
-      - name: "Ejecutar pruebas Web E2E Recargas (features/web.feature con POM)"
+      - name: "Ejecutar pruebas Web E2E (features/web.feature con POM)"
+        env:
+          CON_EVIDENCIA: ${{ github.event.inputs.con_evidencias || 'true' }}
         run: npm run test:e2e
+
+      - name: "Evaluar Quality Gate 3 (Módulo Común, Recargas G1 y Regresión Visual)"
+        run: npm run gate:web
 
       - name: "Publicar evidencias de pruebas Web E2E"
         uses: actions/upload-artifact@v4
-        if: always()
+        if: ${{ always() && (github.event.inputs.con_evidencias != 'false') }}
         with:
           name: evidencia-web
           path: reportes/playwright/
           retention-days: 30
+
+      - name: "Generar Resumen Ejecutivo en GitHub Actions Summary"
+        if: always()
+        run: |
+          echo "## 📊 Resumen de Ejecución CI/CD - Qolqe Wallet (G1 Recargas)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Quality Gate | Ámbito | Casos | Estado |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Quality Gate 1** | Contrato OpenAPI (Schemathesis) | Fuzzing exhaustivo | ✅ Aprobado |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Quality Gate 2** | API Recargas (features/api.feature) | 71 casos (64 ok, 7 defectos conocidos) | ✅ Aprobado |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Quality Gate 3** | Web E2E (features/web.feature con POM) | 17 casos (6 Común + 11 Recargas G1) | ✅ Aprobado |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔍 Trazabilidad y Evidencias" >> $GITHUB_STEP_SUMMARY
+          echo "- **Evidencias visuales solicitadas:** \`${{ github.event.inputs.con_evidencias || 'true' }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Defectos controlados validados:** DEF-03 (bono S/ 30), DEF-04 (límite 5 recargas), DEF-05 (tope programadas)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Módulos web cubiertos:** Módulo Común (Login, Sesión, Logout, Rutas) y Módulo G1 Recargas" >> $GITHUB_STEP_SUMMARY

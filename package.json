@@ -5,9 +5,10 @@
   "scripts": {
     "test": "playwright test",
     "test:api": "playwright test tests/api/recargas.spec.js",
-    "test:e2e": "playwright test tests/e2e/recargas.spec.js",
-    "test:contract": "python scripts/contrato.py",
+    "test:e2e": "playwright test tests/e2e/",
+    "test:contract": "node scripts/ejecutar_contrato.js",
     "gate:api": "node scripts/quality_gate_api.js",
+    "gate:web": "node scripts/quality_gate_web.js",
     "report": "playwright show-report reportes/playwright/html"
   },
   "devDependencies": {

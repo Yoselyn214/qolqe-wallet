@@ -5,6 +5,9 @@ const path = require('node:path');
 const baseURL = 'http://127.0.0.1:8011';
 const pythonCmd = process.env.QOLQE_PYTHON || (process.platform === 'win32' && fs.existsSync(path.resolve('.venv/Scripts/python.exe')) ? `"${path.resolve('.venv/Scripts/python.exe')}"` : 'python');
 
+// Opción de reportería con o sin evidencias visuales (imágenes, trazas, videos)
+const conEvidencia = process.env.CON_EVIDENCIA !== 'false';
+
 module.exports = defineConfig({
   testDir: './tests',
   fullyParallel: false,
@@ -27,9 +30,9 @@ module.exports = defineConfig({
   ],
   use: {
     baseURL,
-    trace: 'retain-on-failure',
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    trace: conEvidencia ? 'retain-on-failure' : 'off',
+    screenshot: conEvidencia ? 'only-on-failure' : 'off',
+    video: conEvidencia ? 'retain-on-failure' : 'off',
   },
   projects: [
     { name: 'api', testMatch: 'api/**/*.spec.js' },

@@ -15,6 +15,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
+const TRAZABILIDAD_API_PATH = path.resolve('reportes/playwright/trazabilidad_api.json');
 const TRAZABILIDAD_PATH = path.resolve('reportes/playwright/trazabilidad.json');
 
 const DEFECTOS_RECARGAS = {
@@ -42,12 +43,14 @@ function main() {
   console.log('   (Basado en los escenarios de features/api.feature)');
   console.log('================================================================');
 
-  if (!fs.existsSync(TRAZABILIDAD_PATH)) {
-    console.error(`❌ ERROR: No se encontró el archivo de trazabilidad en ${TRAZABILIDAD_PATH}`);
+  const targetPath = fs.existsSync(TRAZABILIDAD_API_PATH) ? TRAZABILIDAD_API_PATH : TRAZABILIDAD_PATH;
+
+  if (!fs.existsSync(targetPath)) {
+    console.error(`❌ ERROR: No se encontró el archivo de trazabilidad en ${targetPath}`);
     process.exit(1);
   }
 
-  const trazabilidad = JSON.parse(fs.readFileSync(TRAZABILIDAD_PATH, 'utf-8'));
+  const trazabilidad = JSON.parse(fs.readFileSync(targetPath, 'utf-8'));
   // Filtrar exclusivamente los casos del módulo de Recargas (CP-G1-*)
   const recargasTests = trazabilidad.filter(t => t.cp && t.cp.startsWith('CP-G1-'));
 

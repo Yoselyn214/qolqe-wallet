@@ -33,8 +33,9 @@ Playwright gestiona automáticamente el ciclo de vida del servidor de pruebas (`
 |---|---|
 | `npm test` | Ejecuta **todas** las pruebas (API y Web E2E) usando el navegador Chromium configurado. |
 | `npm run test:api` | Ejecuta exclusivamente las pruebas de API (`tests/api/**/*.spec.js`). |
-| `npm run gate:api` | Evalúa el **Quality Gate 2** (cobertura funcional/técnica y matriz de defectos conocidos). |
+| `npm run gate:api` | Evalúa el **Quality Gate 2** (cobertura funcional/técnica de API y matriz de defectos conocidos). |
 | `npm run test:e2e` | Ejecuta exclusivamente las pruebas Web E2E de interfaz (`tests/e2e/**/*.spec.js`). |
+| `npm run gate:web` | Evalúa el **Quality Gate 3** (cobertura Web E2E del Módulo Común, Recargas y Regresión Visual). |
 | `npx playwright test tests/e2e/recargas.spec.js` | Ejecuta un archivo de prueba específico. |
 
 ---
@@ -177,7 +178,8 @@ Set-Location (Join-Path $raiz "tests\karate")
 | **Playwright** | Ejecutar todo | `npm test` |
 | **Playwright** | Solo API (funcional + técnica) | `npm run test:api` |
 | **Quality Gate** | Evaluar Quality Gate 2 (API) | `npm run gate:api` |
-| **Playwright** | Solo Web E2E | `npm run test:e2e` |
+| **Playwright** | Solo Web E2E (Común + Recargas) | `npm run test:e2e` |
+| **Quality Gate** | Evaluar Quality Gate 3 (Web E2E) | `npm run gate:web` |
 | **Playwright** | Modo Interactivo UI | `npx playwright test --ui` |
 | **Playwright** | Depurador paso a paso | `npx playwright test --debug` |
 | **Playwright** | Actualizar screenshots | `npx playwright test --update-snapshots` |
