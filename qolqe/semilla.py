@@ -31,11 +31,11 @@ VERSION_PLANTILLA = "5"
 
 # (id, dni, nombres, celular, correo, pin actual, pines anteriores, saldo, límite diario, estado)
 USUARIOS_BASE = [
-    (1, "45678912", "Ana Torres Quispe", "987654321", "ana.torres@correo.pe", "4826", ["1357", "2468"], 300000, 200000, "ACTIVA"),
-    (2, "40123456", "Bruno Díaz Mendoza", "912345678", "bruno.diaz@correo.pe", "7391", [], 300000, 200000, "ACTIVA"),
-    (3, "47896541", "Carla Ramos Huamán", "956781234", "carla.ramos@correo.pe", "5917", [], 300000, 200000, "ACTIVA"),
-    (4, "41239876", "Diego Salas Paredes", "998877665", "diego.salas@correo.pe", "3604", [], 300000, 100000, "ACTIVA"),
-    (5, "46543210", "Elena Vargas Ccori", "923456789", "elena.vargas@correo.pe", "8152", [], 300000, 200000, "ACTIVA"),
+    (1, "45678912", "Ana Torres Quispe", "987654321", "ana.torres@correo.pe", "4826", ["1357", "2468"], 150000, 200000, "ACTIVA"),
+    (2, "40123456", "Bruno Díaz Mendoza", "912345678", "bruno.diaz@correo.pe", "7391", [], 80000, 200000, "ACTIVA"),
+    (3, "47896541", "Carla Ramos Huamán", "956781234", "carla.ramos@correo.pe", "5917", [], 5000, 200000, "ACTIVA"),
+    (4, "41239876", "Diego Salas Paredes", "998877665", "diego.salas@correo.pe", "3604", [], 250000, 100000, "ACTIVA"),
+    (5, "46543210", "Elena Vargas Ccori", "923456789", "elena.vargas@correo.pe", "8152", [], 30000, 200000, "ACTIVA"),
     (6, "43215678", "Fabián Rojas Núñez", "934567812", "fabian.rojas@correo.pe", "6029", [], 0, 200000, "CERRADA"),
 ]
 DISPOSITIVO_ANA = "a1b2c3d4e5f60718"

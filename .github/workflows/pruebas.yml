@@ -185,7 +185,7 @@ jobs:
 
       - name: "Iniciar servidor backend Qolqe en segundo plano"
         run: |
-          nohup python -m uvicorn qolqe.main:app --port 8000 > uvicorn_perf.log 2>&1 &
+          nohup python scripts/servidor_pruebas.py --port 8000 > uvicorn_perf.log 2>&1 &
           sleep 4
           curl -f http://127.0.0.1:8000/api/salud || (cat uvicorn_perf.log && exit 1)
 
