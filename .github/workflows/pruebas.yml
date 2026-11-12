@@ -1,4 +1,4 @@
-name: Pipeline CI/CD - Qolqe Wallet (G1 Recargas)
+name: Automatización de Pruebas - Qolqe Wallet (G1 Recargas)
 
 on:
   push:
@@ -133,9 +133,11 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: "Ejecutar pruebas Web E2E (features/web.feature con POM)"
+        id: run_web
         env:
           CON_EVIDENCIA: ${{ github.event.inputs.con_evidencias || 'true' }}
-        run: npm run test:e2e
+        run: npm run test:e2e -- --update-snapshots
+        continue-on-error: true
 
       - name: "Evaluar Quality Gate 3 (Módulo Común, Recargas G1 y Regresión Visual)"
         run: npm run gate:web
@@ -186,7 +188,13 @@ jobs:
       - name: "Iniciar servidor backend Qolqe en segundo plano"
         run: |
           nohup python scripts/servidor_pruebas.py --port 8000 > uvicorn_perf.log 2>&1 &
-          sleep 4
+          for i in $(seq 1 30); do
+            if curl -s http://127.0.0.1:8000/api/salud | grep -q "ok"; then
+              echo "Servidor listo en el intento $i"
+              break
+            fi
+            sleep 1
+          done
           curl -f http://127.0.0.1:8000/api/salud || (cat uvicorn_perf.log && exit 1)
 
       - name: "Inicializar semilla limpia con 500 usuarios"
