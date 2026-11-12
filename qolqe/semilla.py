@@ -17,7 +17,7 @@ from qolqe.reglas.contactos import vencimiento_solicitud
 from qolqe.reglas.recargas import proxima_ejecucion
 
 DIAS_VIGENCIA_PLANTILLA = 7
-USUARIOS_DE_CARGA = 200
+USUARIOS_DE_CARGA = 500
 MOVIMIENTOS_POR_USUARIO_DE_CARGA = 1000
 PIN_USUARIOS_DE_CARGA = "2580"
 
@@ -27,15 +27,15 @@ EMPRESAS = [
     ("INTERNET", "NetAndes", "Internet"),
 ]
 
-VERSION_PLANTILLA = "2"
+VERSION_PLANTILLA = "5"
 
 # (id, dni, nombres, celular, correo, pin actual, pines anteriores, saldo, límite diario, estado)
 USUARIOS_BASE = [
-    (1, "45678912", "Ana Torres Quispe", "987654321", "ana.torres@correo.pe", "4826", ["1357", "2468"], 150000, 200000, "ACTIVA"),
-    (2, "40123456", "Bruno Díaz Mendoza", "912345678", "bruno.diaz@correo.pe", "7391", [], 80000, 200000, "ACTIVA"),
-    (3, "47896541", "Carla Ramos Huamán", "956781234", "carla.ramos@correo.pe", "5917", [], 5000, 200000, "ACTIVA"),
-    (4, "41239876", "Diego Salas Paredes", "998877665", "diego.salas@correo.pe", "3604", [], 250000, 100000, "ACTIVA"),
-    (5, "46543210", "Elena Vargas Ccori", "923456789", "elena.vargas@correo.pe", "8152", [], 30000, 200000, "ACTIVA"),
+    (1, "45678912", "Ana Torres Quispe", "987654321", "ana.torres@correo.pe", "4826", ["1357", "2468"], 300000, 200000, "ACTIVA"),
+    (2, "40123456", "Bruno Díaz Mendoza", "912345678", "bruno.diaz@correo.pe", "7391", [], 300000, 200000, "ACTIVA"),
+    (3, "47896541", "Carla Ramos Huamán", "956781234", "carla.ramos@correo.pe", "5917", [], 300000, 200000, "ACTIVA"),
+    (4, "41239876", "Diego Salas Paredes", "998877665", "diego.salas@correo.pe", "3604", [], 300000, 100000, "ACTIVA"),
+    (5, "46543210", "Elena Vargas Ccori", "923456789", "elena.vargas@correo.pe", "8152", [], 300000, 200000, "ACTIVA"),
     (6, "43215678", "Fabián Rojas Núñez", "934567812", "fabian.rojas@correo.pe", "6029", [], 0, 200000, "CERRADA"),
 ]
 DISPOSITIVO_ANA = "a1b2c3d4e5f60718"
@@ -110,7 +110,7 @@ def _usuarios_de_carga(conexion: sqlite3.Connection) -> None:
             "INSERT INTO usuarios (id, dni, nombres, celular, pin_hash, creado_en) VALUES (?, ?, ?, ?, ?, ?)",
             (uid, f"7{n:07d}", f"Usuario Carga {n:03d}", celular, pin_hash, creado),
         )
-        conexion.execute("INSERT INTO cuentas VALUES (?, ?, ?)", (uid, 1_000_000, creado))
+        conexion.execute("INSERT INTO cuentas VALUES (?, ?, ?)", (uid, 300000, creado))
         conexion.execute("INSERT INTO limites (usuario_id, limite_diario_cent) VALUES (?, ?)", (uid, 200000))
         conexion.execute("INSERT INTO historial_pin (usuario_id, pin_hash, creado_en) VALUES (?, ?, ?)", (uid, pin_hash, creado))
         filas = []
@@ -149,10 +149,14 @@ def _datos_relativos(conexion: sqlite3.Connection, ahora: datetime) -> None:
             "INSERT INTO deudas (empresa, suministro, titular, periodo, monto_cent, vencimiento) VALUES (?, ?, ?, ?, ?, ?)",
             (empresa, suministro, titular, f"{vencimiento:%Y-%m}", monto, vencimiento.isoformat()),
         )
+    filas_deudas = []
+    for n in range(1, USUARIOS_DE_CARGA + 1):
+        for mes in range(1, 11):
+            venc = hoy + timedelta(days=5 + mes * 5)
+            filas_deudas.append(("AGUA", f"40000{n:05d}", f"Usuario Carga {n:03d}", f"{venc:%Y-%m}", 5000 + n * 10, venc.isoformat()))
     conexion.executemany(
         "INSERT INTO deudas (empresa, suministro, titular, periodo, monto_cent, vencimiento) VALUES (?, ?, ?, ?, ?, ?)",
-        [("AGUA", f"40000{n:05d}", f"Usuario Carga {n:03d}", f"{hoy:%Y-%m}", 5000 + n * 10,
-          (hoy - timedelta(days=5)).isoformat()) for n in range(1, USUARIOS_DE_CARGA + 1)],
+        filas_deudas,
     )
 
     conexion.executemany(

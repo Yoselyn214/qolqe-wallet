@@ -2,9 +2,9 @@ name: Pipeline CI/CD - Qolqe Wallet (G1 Recargas)
 
 on:
   push:
-    branches: [main, actualizacion]
+    branches: [main]
   pull_request:
-    branches: [main, actualizacion]
+    branches: [main]
   workflow_dispatch:
     inputs:
       con_evidencias:
