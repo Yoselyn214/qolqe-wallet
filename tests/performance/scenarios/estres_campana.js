@@ -7,7 +7,7 @@ import { BASE_URL, THRESHOLDS, pensar } from '../config.js';
 import { login } from '../flujos/auth.js';
 import { consultarSaldoYPerfil, consultarMovimientos } from '../flujos/consultas.js';
 import { transferir } from '../flujos/transferencias.js';
-import { recargar, consultarConfiguracionRecargas, listarMisRecargas } from '../flujos/recargas.js';
+import { recargar, consultarConfiguracionRecargas, listarMisRecargas, obtenerCelularRecarga, MONTOS_VALIDOS_G1 } from '../flujos/recargas.js';
 
 const usuarios = JSON.parse(open('../data/usuarios.json'));
 
@@ -41,7 +41,6 @@ export default function () {
 
   const destIndex = (vuIndex + 1) % usuarios.length;
   const destCelular = usuarios[destIndex].celular;
-  const recargaCelular = `988${String(user.vu).padStart(6, '0')}`;
 
   // 1. Inicio de sesión
   const token = login(user.celular, user.pin);
@@ -63,7 +62,10 @@ export default function () {
     } else if (suerte < 75) {
       transferir(token, destCelular, 5.0);
     } else if (suerte < 95) {
-      recargar(token, recargaCelular, 10);
+      // Rotación entre 5 destinos frecuentes por VU para no superar 5 recargas/día a ningún número (RN-02)
+      const recargaCelular = obtenerCelularRecarga(user.vu, op + __ITER);
+      const montoRecarga = MONTOS_VALIDOS_G1[(op + __ITER) % MONTOS_VALIDOS_G1.length];
+      recargar(token, recargaCelular, montoRecarga);
     } else {
       consultarConfiguracionRecargas(token);
       listarMisRecargas(token);

@@ -8,7 +8,7 @@ import { BASE_URL, THRESHOLDS, pensarRapido } from '../config.js';
 import { login } from '../flujos/auth.js';
 import { consultarSaldoYPerfil, consultarMovimientos } from '../flujos/consultas.js';
 import { transferir } from '../flujos/transferencias.js';
-import { recargar, consultarConfiguracionRecargas, listarMisRecargas } from '../flujos/recargas.js';
+import { recargar, consultarConfiguracionRecargas, listarMisRecargas, obtenerCelularRecarga, MONTOS_VALIDOS_G1 } from '../flujos/recargas.js';
 
 const usuarios = JSON.parse(open('../data/usuarios.json'));
 
@@ -24,7 +24,6 @@ export default function () {
 
   const destIndex = (vuIndex + 1) % usuarios.length;
   const destCelular = usuarios[destIndex].celular;
-  const recargaCelular = `988${String(user.vu).padStart(6, '0')}`;
 
   // 1. Login (Núcleo Común)
   const token = login(user.celular, user.pin);
@@ -47,7 +46,9 @@ export default function () {
   consultarConfiguracionRecargas(token);
   pensarRapido(0.5, 1);
 
-  recargar(token, recargaCelular, 10);
+  const recargaCelular = obtenerCelularRecarga(user.vu, __ITER);
+  const montoRecarga = MONTOS_VALIDOS_G1[__ITER % MONTOS_VALIDOS_G1.length];
+  recargar(token, recargaCelular, montoRecarga);
   pensarRapido(0.5, 1);
 
   listarMisRecargas(token);
