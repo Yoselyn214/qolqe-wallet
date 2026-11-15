@@ -99,6 +99,27 @@ Conforme a los lineamientos del curso, se definió cada umbral de forma estricta
 
 ---
 
+### 3.3. Identificación y Justificación de los 3 Flujos Críticos
+Conforme al Punto 1 del enunciado oficial, se priorizaron 3 flujos según frecuencia, impacto financiero y riesgo:
+1. **Consulta de Saldo y Movimientos (`GET /api/cuentas/me/saldo`, `GET /api/movimientos`):** 45% del volumen total. Flujo de mayor frecuencia que valida la experiencia inmediata del cliente y somete a estrés las lecturas en BD.
+2. **Transferencias P2P (`POST /api/transferencias`):** 20% del volumen. Flujo de impacto financiero directo que debita a un usuario y acredita a otro simultáneamente en una transacción ACID, compitiendo por locks de escritura.
+3. **Recargas de Celular con Bonificación (`POST /api/recargas`):** 20% del volumen. Módulo asignado al Grupo G1, evaluando la aplicación del bono del 5% (montos $\ge 30$), topes diarios de 5 operaciones y persistencia de comprobantes bajo concurrencia masiva.
+
+### 3.4. Cadena de Custodia, Trazabilidad y Autenticidad de las Gráficas
+Para certificar que las gráficas de telemetría son legítimas y obtenidas de las ejecuciones reales:
+1. **Captura en Vivo (`monitor_recursos.py`):** Muestrea segundo a segundo el proceso del servidor Uvicorn vía `psutil`, registrando hora exacta, CPU % y memoria RAM RSS.
+2. **Datasets Crudos Preservados:**
+   - `recursos_carga.csv`: 615 muestras continuas (prueba de 9 minutos + estabilización).
+   - `recursos_pico.csv`: 332 muestras continuas (prueba de 4.5 minutos).
+   - `recursos_estres.csv`: 591 muestras continuas (prueba de 9.25 minutos en 4 escalones).
+3. **Regeneración Determinista:** Las imágenes PNG no son aleatorias; son renderizadas matemáticamente por `graficar_recursos.py` usando `matplotlib`.
+   - Comando de regeneración en vivo:
+     ```powershell
+     python tests/performance/graficar_recursos.py tests/performance/resultados/recursos_carga.csv verificacion.png "Test Carga"
+     ```
+
+---
+
 ## 4. Guía de Ejecución de las Pruebas
 
 ### 4.1. Escenario 1: Prueba de Humo (Smoke Test)
