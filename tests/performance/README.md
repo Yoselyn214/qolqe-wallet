@@ -71,13 +71,31 @@ Para garantizar la reproducibilidad y validez de los resultados de rendimiento (
 
 ---
 
-## 3. Umbrales de Rendimiento (SLAs)
+## 3. Umbrales de Rendimiento Formales (SLAs) y Ponderación de Operaciones
 
-Definidos contractualmente en `config.js` conforme al documento de requisitos:
-- **Transacciones de Consulta (Lectura):** 95% de peticiones (`p(95)`) $\le$ 800 ms.
-- **Transacciones Monetarias (Escritura):** 95% de peticiones (`p(95)`) $\le$ 1500 ms.
-- **Tasa Global de Fallos HTTP:** $\le$ 1.00% (`http_req_failed`).
-- **Validez de Entorno Local:** Uso de CPU de herramientas $\le$ 80% para evitar saturación espuria.
+### 3.1. Definición Formal de Umbrales (Requerimiento $\to$ Umbrales Contractuales)
+Conforme a los lineamientos del curso, se definió cada umbral de forma estricta: **métrica técnica + percentil/agregación + valor límite + carga aplicable + supuestos**:
+
+| Requerimiento de Negocio | Métrica en k6 | Percentil / Agregación | Valor Límite | Carga Aplicable | Supuestos y Precisiones |
+|---|---|---|---|---|---|
+| **Consultas e inicio de sesión** | `http_req_duration{tipo:consulta}` | **p(95)** | **$\le$ 800 ms** | 100 VUs (Hora Punta) y 300 VUs (Pico) | Incluye login (`POST /api/auth/login`), saldo, perfil, movimientos y catálogo/historial de recargas. |
+| **Operaciones de dinero** | `http_req_duration{tipo:dinero}` | **p(95)** | **$\le$ 1500 ms** | 100 VUs (Hora Punta) y 300 VUs (Pico) | Incluye transferencias P2P (`POST /api/transferencias`) y recargas manuales (`POST /api/recargas`). |
+| **Tasa de error global en hora punta** | `http_req_failed` | **Rate (%)** | **$\le$ 1.00%** | 100 VUs sostenidos | Mide exclusivamente errores 5xx de servidor o timeouts de conexión. |
+| **Throughput nominal de hora punta** | `http_reqs` (Tasa req/s) | **Promedio continuo** | **$\ge$ 5.00 req/s** | 100 VUs sostenidos | 3,000 sesiones/h $\times$ 6 op/sesión = 18,000 op/h $\implies 5.0\text{ req/s}$ nominales. |
+| **Degradación admisible en pico** | `http_req_duration` | **p(95)** | **Hasta +50%** | 300 VUs (Pico) | Se tolera hasta 1200 ms en consultas y 2000 ms en dinero sin superar 1% de error. |
+| **Integridad transaccional de dinero** | Auditoría pre/post de balance | **Inconsistencias** | **0.00%** | Todos los escenarios | Cero transacciones duplicadas, corruptas o con pérdida de fondos. |
+
+### 3.2. Ponderación de Operaciones: Mapeo del Negocio al Alcance del Grupo G1
+
+| Operación en Requerimiento General | % Original | Módulo SUT | % en Script k6 (G1) | Justificación de la Distribución |
+|---|---|---|---|---|
+| Consultar saldo y perfil | 30% | Núcleo | **35%** | Lectura recurrente básica antes y después de cada flujo. |
+| Consultar movimientos | 15% | Núcleo | **20%** | Consulta pesada en base de datos con ordenamiento cronológico. |
+| Transferir a otro usuario | 15% | Núcleo | **20%** | Transacción monetaria del núcleo común para someter a estrés la BD. |
+| **Recargar un celular** | 10% | **G1 (Asignado)** | **20%** | **Módulo asignado:** Se **duplicó** su cuota para sobreexigir al módulo de recargas. |
+| **Catálogo y config. de recargas** | *G1* | **G1 (Asignado)** | **5%** | Consulta previa de operadores disponibles y montos permitidos. |
+| Contactos, servicios y otros | 30% | G2, G4, G5, G6 | *0% (Reasignado)* | Reasignados a Núcleo y G1 para evaluar el alcance asignado al 100%. |
+| **TOTAL** | **100%** | | **100%** | **Distribución balanceada y cerrada al 100%.** |
 
 ---
 
@@ -130,10 +148,26 @@ k6 run tests/performance/scenarios/estres_campana.js
 
 ---
 
-## 5. Visualización de Resultados
+## 5. Visualización e Interpretación de Resultados
 
-Los reportes HTML generados se abren directamente en cualquier navegador web:
-- `tests/performance/resultados/reporte_carga.html`
-- `tests/performance/resultados/reporte_pico.html`
-- `tests/performance/resultados/reporte_estres.html`
-- `tests/performance/resultados/reporte_humo.html`
+Los reportes interactivos HTML se encuentran en `tests/performance/resultados/`:
+- `reporte_carga.html` (Hora Punta - 100 VUs)
+- `reporte_pico.html` (Pico Campaña - 300 VUs)
+- `reporte_estres.html` (Estrés y Breakpoint - 500 VUs)
+- `reporte_humo.html` (Smoke Test - 2 VUs)
+
+### 5.1. Guía de Lectura de los Indicadores en los Reportes HTML
+* **Total Requests:** Volumen acumulado de peticiones completadas (ej. 3,899 en Hora Punta, 14,439 en Estrés).
+* **Failed Requests:** Cantidad de peticiones no exitosas. En Hora Punta se registró solo **1 petición fallida de 3,899** (tasa de error real: **0.025%**, cumpliendo con creces el límite de 1.00%).
+* **p(95) frente a avg:** El percentil 95 certifica el tiempo experimentado por el 95% de los usuarios, evitando el sesgo del promedio.
+* **Throughput (req/s):** Tasa de procesamiento sostenida del servidor (7.22 req/s en carga, superando la meta de 5.0 req/s).
+
+### 5.2. Matriz Ejecutiva de Verificación de Umbrales (SLAs)
+
+| Escenario | Métrica Evaluada | Umbral Contractual | Valor Real Obtenido | Margen de Holgura | Estado de Calidad |
+|---|---|---|---|---|---|
+| **Humo (2 VUs)** | Consultas p(95)<br/>Dinero p(95)<br/>Tasa de Error | $< 800\text{ ms}$<br/>$< 1500\text{ ms}$<br/>$\le 1.00\%$ | **176.9 ms**<br/>**112.8 ms**<br/>**0.00%** | 77.8% holgura<br/>92.4% holgura<br/>Sin fallos | ✅ **CUMPLE** |
+| **Carga (100 VUs)** | Consultas p(95)<br/>Dinero p(95)<br/>Tasa de Error<br/>Throughput | $< 800\text{ ms}$<br/>$< 1500\text{ ms}$<br/>$\le 1.00\%$<br/>$\ge 5.0\text{ req/s}$ | **163.9 ms**<br/>**120.7 ms**<br/>**0.025%** (1 / 3,899)<br/>**7.22 req/s** | **79.5% holgura**<br/>**91.9% holgura**<br/>**97.5% bajo el tope**<br/>+44.4% capacidad | ✅ **CUMPLE PLENAMENTE** |
+| **Pico (300 VUs)** | Consultas p(95)<br/>Dinero p(95)<br/>Tasa de Error<br/>Throughput | $< 800\text{ ms}$ (hasta +50%)<br/>$< 1500\text{ ms}$<br/>$\le 1.00\%$<br/>Absorción | **195.7 ms**<br/>**126.3 ms**<br/>**0.027%** (1 / 3,720)<br/>**12.46 req/s** | **75.5% holgura**<br/>**91.6% holgura**<br/>Sin degradación<br/>Triple de carga | ✅ **CUMPLE PLENAMENTE** |
+| **Estrés (500 VUs)** | Consultas p(95)<br/>Dinero p(95)<br/>Tasa de Error<br/>CPU Servidor | $< 800\text{ ms}$<br/>$< 1500\text{ ms}$<br/>$\le 1.00\%$<br/>$< 80\%$ | **162.1 ms**<br/>**126.7 ms**<br/>**0.11%** (16 / 14,439)<br/>**67.3%** prom. (pico 288%) | Latencia contenida<br/>Latencia contenida<br/>Contención de lock<br/>Saturación worker | ⚠️ **BREAKPOINT (500 VUs)** |
+

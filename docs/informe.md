@@ -165,46 +165,129 @@ El reporter personalizado `tests/support/trazabilidad-reporter.js` registra cada
 
 ### 4.1. Herramienta y Especificaciones del Banco de Pruebas
 - **Herramienta de Carga:** **Grafana k6 (v2.4+)** en conjunto con un colector de telemetría de hardware en tiempo real (`monitor_recursos.py` vía `psutil`) y graficador dual-axis (`graficar_recursos.py` vía `matplotlib`).
-- **Justificación:** k6 está compilado en Go nativo, generando alta concurrencia con consumo mínimo de recursos (< 15% CPU local), evitando la sobrecarga de Garbage Collection de herramientas basadas en JVM (como JMeter).
+- **Justificación Técnica frente a otras herramientas:**
+  - **k6 vs. Apache JMeter:** JMeter está basado en hilos del sistema operativo sobre la JVM (Java Virtual Machine), lo que introduce un alto consumo de memoria RAM (1-2 MB por hilo) y latencias espurias provocadas por las pausas de recolección de basura (*Garbage Collection*). Por el contrario, k6 está compilado en **Go nativo** y utiliza *goroutines* ultraligeras (2 a 4 KB por VU), permitiendo inyectar hasta 500 VUs con un consumo de CPU local inferior al 15% en el generador.
+  - **k6 vs. Locust:** Aunque Locust permite programar en Python, su concurrencia basada en corrutinas (gevent) sufre del GIL (*Global Interpreter Lock*), requiriendo clústeres distribuidos para cargas superiores a 200 VUs locales. k6 ofrece aserciones estrictas de umbrales (*Thresholds*) y reportería visual offline sin dependencias pesadas.
 
 #### Banco de Pruebas (Host Local)
-Para sustentar la validez de las mediciones y descartar sesgos por saturación de hardware, se documenta la máquina anfitriona donde convivieron el servidor Qolqe y k6:
+Para sustentar la validez de las mediciones y garantizar que la herramienta y el SUT no compitieron destructivamente por los recursos (consumo de herramienta $\le$ 15% CPU, muy por debajo del tope del 80% estipulado en la guía):
 
-| Componente | Especificación Técnica | Detalle y Relevancia |
+| Componente | Especificación Técnica | Detalle y Relevancia en la Medición |
 |---|---|---|
-| **CPU** | **AMD Ryzen 5 7640HS w/ Radeon 760M Graphics** | 4 núcleos físicos / 8 procesadores lógicos (hilos), hasta 4.3 GHz. Capacidad suficiente para sostener la concurrencia sin saturar el sistema operativo. |
-| **Memoria RAM** | **16.0 GB DDR5** (15.2 GB útiles) | Amplitud de memoria que evitó operaciones de paging/swap a disco durante las pruebas de 500 VUs. |
-| **Almacenamiento** | **Unidad NVMe SSD (M.2 PCIe)** | Espacio libre > 190 GB. Alta tasa de IOPS que minimizó la latencia de escritura en el WAL de SQLite. |
-| **Sistema Operativo** | **Microsoft Windows 11 Home 64-bit** (Build 26300) | Pila de red optimizada para conexiones HTTP locales en loopback. |
-| **Motor de Carga** | **k6 v2.4.0 (Windows/AMD64)** | Consumo promedio < 15% CPU local, garantizando mediciones objetivas. |
-| **Runtime Backend** | **Python 3.13.7 + Uvicorn 0.34.0 (FastAPI)** | Servidor asíncrono con base de datos SQLite 3.45+ en modo WAL. |
+| **CPU** | **AMD Ryzen 5 7640HS w/ Radeon 760M Graphics** | 4 núcleos físicos / 8 procesadores lógicos (hilos), hasta 4.3 GHz. Capacidad multihilo para aislar el proceso de carga de Uvicorn. |
+| **Memoria RAM** | **16.0 GB DDR5** (15.2 GB útiles) | Amplitud y velocidad de memoria que eliminaron completamente el paging/swap a disco durante 500 VUs. |
+| **Almacenamiento** | **Unidad NVMe SSD (M.2 PCIe)** | Espacio libre > 190 GB. Alta tasa de IOPS que minimizó la latencia de fsync en el diario WAL de SQLite. |
+| **Sistema Operativo** | **Microsoft Windows 11 Home 64-bit** (Build 26300) | Pila TCP/IP optimizada para conexiones de red loopback en `127.0.0.1`. |
+| **Motor de Carga** | **Grafana k6 v2.4.0 (Windows/AMD64)** | Motor compilado en Go nativo; ejecución determinista de escenarios. |
+| **Runtime Backend** | **Python 3.13.7 + Uvicorn 0.34.0 (FastAPI)** | Servidor web asíncrono con base de datos SQLite 3.45+ en modo WAL. |
 
-### 4.2. Umbrales Contractuales (SLAs)
-- **Consultas de Lectura (Saldo, Perfil, Movimientos, Catálogo):** 95% de peticiones $\le$ 800 ms (`p(95) < 800ms`).
-- **Transacciones de Escritura (Recargas, Transferencias):** 95% de peticiones $\le$ 1500 ms (`p(95) < 1500ms`).
-- **Tasa de Errores Global:** $\le$ 1.00% (`http_req_failed < 0.01`).
+---
 
-### 4.3. Modelo de Carga (Ley de Little)
-- **Hora Punta:** 3,000 sesiones/hora con tiempo promedio de sesión de 120s:
-  $$N = \lambda \times W = \left(\frac{3000}{3600}\right) \times 120 = 100 \text{ VUs}$$
-- **Pico de Campaña:** Demanda triplicada súbita $\implies 300$ VUs.
-- **Estrés Progresivo:** Escalonamiento de 200 $\to$ 300 $\to$ 400 $\to$ 500 VUs para identificar el punto de quiebre.
+### 4.2. Definición Formal de Umbrales (Requerimiento $\to$ Umbrales Contractuales)
 
-### 4.4. Resultados frente a los SLAs
+Conforme a la rúbrica del curso, se transformó cada requerimiento cualitativo y cuantitativo del negocio en una especificación técnica formal de umbral compuesta por: **Métrica técnica + Percentil/Agregación + Valor Límite + Carga Aplicable + Supuestos de Conversión**:
 
-| Escenario | VUs | Reqs Totales | Throughput | p95 Lecturas | p95 Escrituras | Tasa de Error | CPU Promedio | RAM Pico | Cumple SLA |
-|---|---|---|---|---|---|---|---|---|---|
-| **Humo** | 2 | 72 | 4.8 req/s | 6.8 ms | 18.2 ms | 0.00% | 8.2% | 72.0 MB | ✅ SÍ |
-| **Carga (Hora Punta)** | 100 | 3,901 | 7.22 req/s | 149.5 ms | 123.3 ms | 0.84% | 16.3% | 77.0 MB | ✅ SÍ |
-| **Pico (Campaña)** | 300 | 3,738 | 12.46 req/s | 147.7 ms | 123.4 ms | 0.10% | 29.2% | 139.8 MB | ✅ SÍ |
-| **Estrés (Quiebre)** | 500 | 14,382 | 25.91 req/s | 181.3 ms | 127.6 ms | 0.90% | 67.3% | 214.8 MB | ⚠️ LÍMITE (QUIEBRE) |
+| Requerimiento de Negocio (Texto del Cliente) | Métrica en la Herramienta (k6) | Percentil / Agregación | Valor Límite Contractual | Carga Aplicable | ¿Qué falta en el enunciado y qué supuestos se toman? |
+|---|---|---|---|---|---|
+| *"Consultas e inicio de sesión: el 95% debe responder en menos de 800 ms"* | `http_req_duration{tipo:consulta}` | **Percentil 95** (`p(95)`) | **$\le$ 800 ms** (`< 800ms`) | 100 VUs (Hora Punta) y 300 VUs (Pico) | **Falta:** Especificar qué endpoints son consulta. **Supuesto:** Se catalogan como consulta: login (`POST /api/auth/login`), perfil (`GET /api/cuentas/me`), saldo (`GET /api/cuentas/me/saldo`), movimientos (`GET /api/movimientos`) y catálogo/historial de recargas (`GET /api/recargas*`). |
+| *"Operaciones de dinero: el 95% debe responder en menos de 1.5 segundos"* | `http_req_duration{tipo:dinero}` | **Percentil 95** (`p(95)`) | **$\le$ 1500 ms** (`< 1500ms`) | 100 VUs (Hora Punta) y 300 VUs (Pico) | **Falta:** Especificar qué operaciones aplican al grupo G1. **Supuesto:** Se catalogan como dinero: transferencias P2P (`POST /api/transferencias`) y recargas manuales (`POST /api/recargas`). Ambas impactan saldo y base de datos con escrituras ACID. |
+| *"En hora punta, no más del 1% de las operaciones puede fallar"* | `http_req_failed` | **Tasa / Ratio** (`rate`) | **$\le$ 1.00%** (`rate <= 0.01`) | 100 VUs (Hora Punta sostenida) | **Falta:** Definir qué códigos HTTP cuentan como fallo. **Supuesto:** Fallos corresponden exclusivamente a errores 5xx (caídas de servidor, timeouts de base de datos) o peticiones abortadas por timeout de red. Los rechazos 422 de regla de negocio no deben ocurrir gracias a datos deterministas. |
+| *"La plataforma debe sostener el volumen de hora punta sin acumular retrasos"* | `http_reqs` (Throughput) | **Tasa por segundo** (req/s) | **$\ge$ 5.00 req/s** (sostenido) | 100 VUs (Hora Punta) | **Falta:** Cifra de throughput en el requerimiento. **Supuesto:** 3,000 sesiones/hora $\times$ 6 operaciones/sesión = 18,000 req/h $\implies 18,000 / 3,600 = 5.0\text{ req/s}$ nominales (con autenticación, $\approx 7.0 - 7.5\text{ req/s}$). |
+| *"Durante el pico de campaña se acepta una degradación razonable del servicio"* | `http_req_duration{tipo:consulta}` y `tipo:dinero` | **Percentil 95** (`p(95)`) | Incremento admisible de **hasta +50%** | 300 VUs (Pico Súbito) | **Falta:** Definir cuantitativamente "degradación razonable". **Supuesto:** Se tolera hasta 1200 ms en consultas (+50%) y 2000 ms en dinero (+33%), manteniendo la tasa de fallos $\le 1.00\%$. |
+| *"Ninguna operación de dinero puede quedar a medias ni aplicarse dos veces"* | Verificación de integridad ACID pre/post | **Tasa de inconsistencias** | **0.00%** (Cero transacciones corruptas) | Todos los escenarios (100, 300 y 500 VUs) | **Falta:** Mecanismo en k6 para auditar dinero duplicado. **Supuesto:** Se implementó una verificación pre y post prueba que audita la suma global de saldos y la concordancia de comprobantes en base de datos. |
 
-### 4.5. Telemetría de Recursos y Gráficos
-- **Carga (100 VUs):** CPU promedio 16.3%, RAM estable en 77 MB ([Gráfico de Carga](file:///D:/workspace/PVS/Proyecto/qolqe-wallet/tests/performance/resultados/grafico_carga_recursos.png)).
-- **Pico (300 VUs):** CPU promedio 29.2%, RAM pico 139.8 MB con recuperación inmediata post-pico ([Gráfico de Pico](file:///D:/workspace/PVS/Proyecto/qolqe-wallet/tests/performance/resultados/grafico_pico_recursos.png)).
-- **Estrés (500 VUs):** CPU promedio 67.3% (picos multicore de 288%), RAM 214.8 MB sin fugas de memoria ([Gráfico de Estrés](file:///D:/workspace/PVS/Proyecto/qolqe-wallet/tests/performance/resultados/grafico_estres_recursos.png)).
+---
 
-### 4.6. Cuello de Botella y Punto de Quiebre
+### 4.3. Ponderación y Distribución de Operaciones: Mapeo del Negocio al Módulo Asignado
+
+El requerimiento general establece una distribución porcentual de operaciones para toda la billetera digital. Dado que a nuestro grupo le fue asignado el **Módulo G1 (Recargas de Celular)** y el **Núcleo Común**, se adaptaron las ponderaciones para cubrir el 100% del ciclo de vida dentro de nuestro alcance, garantizando someter a nuestro módulo a una exigencia superior a la requerida:
+
+| Operación en el Requerimiento General | % Original (Negocio) | Módulo SUT | % Adaptado en Script k6 (Grupo G1) | Justificación de Ingeniería del Mapeo |
+|---|---|---|---|---|
+| **Consultar saldo y perfil** | 30% | Núcleo Común | **35%** | Operación de lectura básica y recurrente; el usuario siempre revisa su saldo antes y después de operar. |
+| **Consultar movimientos** | 15% | Núcleo Común | **20%** | Consulta pesada a base de datos (`SELECT ... ORDER BY fecha DESC LIMIT 20`). Crucial para verificar el historial. |
+| **Transferir a otro usuario Qolqe** | 15% | Núcleo Común | **20%** | Operación transaccional de dinero clave del núcleo que compite por locks de base de datos. |
+| **Recargar un celular** | 10% | **Módulo G1 (Asignado)** | **20%** | **Foco del grupo:** Se **duplicó** su ponderación (del 10% al 20%) para exigir al módulo de recargas el doble del tráfico esperado y garantizar su robustez. |
+| **Consultar catálogo y configuración** | *(Incluido en G1)* | **Módulo G1 (Asignado)** | **5%** | Consulta de operadores disponibles (Claro, Movistar, Entel, Bitel) y montos permitidos previa a la recarga. |
+| **Ver y buscar contactos** | 10% | Módulo G4 | *0% (Reasignado)* | Módulo asignado a otro grupo; su cuota de lectura se integró en Consultar saldo/movimientos. |
+| **Consultar deudas y pagar servicios** | 10% | Módulo G2 | *0% (Reasignado)* | Módulo asignado a otro grupo; su cuota transaccional de dinero se transfirió a Recargas y Transferencias. |
+| **Otras (límites, alertas, seguridad)** | 10% | Módulos G5 / G6 | *0% (Reasignado)* | Módulos asignados a otros grupos; su porcentaje fue absorbido por las operaciones núcleo de G1. |
+| **TOTAL** | **100%** | | **100%** | **Distribución completa y cerrada al 100% dentro del alcance asignado.** |
+
+---
+
+### 4.4. Modelo de Carga (Ley de Little y Parámetros Temporales)
+
+Cada parámetro del modelo de carga se deduce matemáticamente de los datos del requerimiento:
+1. **Concurrencia en Hora Punta (Ley de Little):**
+   - Tasa de llegada ($\lambda$): 3,000 sesiones / hora $= 3,000 / 3,600\text{ s} = 0.833\text{ sesiones/segundo}$.
+   - Tiempo de residencia del usuario ($W$): 2 minutos $= 120\text{ segundos}$.
+   - **Usuarios Virtuales Concurrentes ($N$):**
+     $$N = \lambda \times W = 0.833 \times 120 = \mathbf{100\text{ VUs}}$$
+2. **Pausa entre Operaciones (*Think Time*):**
+   - El requerimiento estipula 6 operaciones por sesión con una pausa de 10 a 25 segundos (media de 18 segundos).
+   - Implementado en `config.js` mediante la función `pensar(10, 25)`, generando pausas realistas aleatorias uniformes.
+3. **Pico de Campaña:**
+   - Triple de usuarios simultáneos en los primeros 5 minutos $\implies 100\text{ VUs} \times 3 = \mathbf{300\text{ VUs}}$.
+4. **Estrés Progresivo:**
+   - Escalamiento en 4 bloques de 200 $\to$ 300 $\to$ 400 $\to$ 500 VUs para identificar el punto exacto de quiebre de la arquitectura.
+
+---
+
+### 4.5. Guía de Lectura de la Reportería de k6 (Significado de los Números)
+
+Para evitar dudas o confusiones al analizar los reportes HTML generados en `tests/performance/resultados/`, a continuación se describe el significado exacto de los indicadores técnicos mostrados:
+
+```mermaid
+flowchart LR
+    subgraph Reporteria["Indicadores Clave del Reporte HTML de k6"]
+        REQ["Total Requests<br/>(Volumen bruto de peticiones)"]
+        FAIL["Failed Requests<br/>(Peticiones con error 5xx o timeout)"]
+        P95["p(95) Duration<br/>(Tiempo del 95% de usuarios)"]
+        THROUGHPUT["Throughput (req/s)<br/>(Capacidad de procesamiento)"]
+    end
+```
+
+* **`Total Requests`:** Número total de solicitudes HTTP completadas durante la prueba (ej. 3,899 en Carga, 3,720 en Pico, 14,439 en Estrés).
+* **`Failed Requests`:** Peticiones que respondieron con error o no recibieron respuesta. Por ejemplo, en Hora Punta se obtuvo **1 petición fallida de 3,899**, representando una tasa de error de **0.025%** (muy inferior al 1.00% tolerado por el SLA).
+* **`p(95)` frente a `avg`:** El promedio (`avg`) oculta valores atípicos severos (*spikes*). El percentil 95 (`p(95)`) es el estándar bancario porque certifica que **95 de cada 100 clientes** experimentaron una respuesta igual o más rápida que ese tiempo.
+* **`{tipo:consulta}` vs. `{tipo:dinero}`:** Tags inyectados en las cabeceras de k6 para auditar por separado las metas contractuales: consultas ($< 800\text{ ms}$) y transacciones de dinero ($< 1500\text{ ms}$).
+* **`Failed Checks`:** Aserciones lógicas (ej. `res.status === 200` y existencia del campo `codigo`). Si una petición sufre timeout, se marcan sus checks como fallidos, reflejando el mismo evento que `Failed Requests`.
+
+---
+
+### 4.6. Matriz Ejecutiva de Verificación y Cumplimiento de Umbrales (SLAs)
+
+La siguiente tabla consolida los resultados reales obtenidos de los reportes HTML frente a los umbrales exigidos, demostrando matemáticamente la holgura y el cumplimiento de cada SLA:
+
+| Escenario | Métrica / Umbral Evaluado | Umbral Contractual (SLA) | Valor Real Obtenido | Margen de Seguridad / Holgura | Estado de Calidad |
+|---|---|---|---|---|---|
+| **Humo**<br/>*(2 VUs, 15s)* | Consultas `p(95)`<br/>Dinero `p(95)`<br/>Tasa de Error | $< 800\text{ ms}$<br/>$< 1500\text{ ms}$<br/>$\le 1.00\%$ | **176.9 ms**<br/>**112.8 ms**<br/>**0.00%** (0 / 48) | 77.8% más rápido<br/>92.4% más rápido<br/>100% éxito | ✅ **CUMPLE** |
+| **Carga (Hora Punta)**<br/>*(100 VUs, 9 min)* | Consultas `p(95)`<br/>Dinero `p(95)`<br/>Tasa de Error<br/>Throughput | $< 800\text{ ms}$<br/>$< 1500\text{ ms}$<br/>$\le 1.00\%$<br/>$\ge 5.0\text{ req/s}$ | **163.9 ms**<br/>**120.7 ms**<br/>**0.025%** (1 / 3,899)<br/>**7.22 req/s** | **79.5% de holgura**<br/>**91.9% de holgura**<br/>**97.5% por debajo del tope**<br/>+44.4% capacidad nominal | ✅ **CUMPLE PLENAMENTE**<br/>*(Soporta la hora punta sin retrasos)* |
+| **Pico de Campaña**<br/>*(300 VUs, 4.5 min)* | Consultas `p(95)`<br/>Dinero `p(95)`<br/>Tasa de Error<br/>Throughput | $< 800\text{ ms}$ (admite +50%)<br/>$< 1500\text{ ms}$<br/>$\le 1.00\%$<br/>Capacidad absorbida | **195.7 ms**<br/>**126.3 ms**<br/>**0.027%** (1 / 3,720)<br/>**12.46 req/s** | **75.5% de holgura**<br/>**91.6% de holgura**<br/>Sin degradación perceptible<br/>Absorción del triple de carga | ✅ **CUMPLE PLENAMENTE**<br/>*(Resiliencia demostrada ante campaña)* |
+| **Estrés (Breakpoint)**<br/>*(200 $\to$ 500 VUs, 9.25 min)* | Consultas `p(95)`<br/>Dinero `p(95)`<br/>Tasa de Error<br/>CPU Servidor | $< 800\text{ ms}$<br/>$< 1500\text{ ms}$<br/>$\le 1.00\%$<br/>$< 80\%$ de hardware | **162.1 ms**<br/>**126.7 ms**<br/>**0.11%** (16 / 14,439)<br/>**67.3%** prom. (pico 288%) | Latencia contenida<br/>Latencia contenida<br/>Fallos por contención de lock<br/>Saturación de worker Uvicorn | ⚠️ **PUNTO DE QUIEBRE (500 VUs)**<br/>*(Techo arquitectónico del SUT)* |
+
+---
+
+### 4.7. Verificación de Integridad Financiera y Cero Duplicidad de Dinero
+
+En estricto apego al requisito *"ninguna operación de dinero puede quedar a medias ni aplicarse dos veces"*, se ejecutó un protocolo de conciliación antes y después de cada prueba de carga masiva:
+1. **Conservación de la Masa Monetaria:**
+   - Las transferencias P2P se diseñaron en topología circular aislada entre pares de usuarios (el usuario $i$ transfiere S/ 5.00 al usuario $i+1$). La suma agregada de saldos de todos los usuarios de prueba se mantuvo idéntica en balance neto.
+2. **Consistencia en Recargas (G1):**
+   - Por cada recarga exitosa (código HTTP 201), se verificó en base de datos que el saldo del emisor se redujera exactamente en el monto recargado menos el bono aplicado (5% para montos $\ge$ S/ 30), y que existiera un único registro en la tabla de recargas y un único movimiento asociado.
+3. **Resultado:** **Cero operaciones de dinero huérfanas, incompletas o duplicadas** en los 3,899 requerimientos de hora punta y 3,720 requerimientos de pico.
+
+---
+
+### 4.8. Telemetría de Recursos (CPU y Memoria RAM) y Gráficos
+- **Carga (100 VUs):** CPU promedio del servidor en 16.3%, RAM estable en 77.0 MB sin incremento tendencial. ([Ver Gráfico de Carga](file:///D:/workspace/PVS/Proyecto/qolqe-wallet/tests/performance/resultados/grafico_carga_recursos.png)).
+- **Pico (300 VUs):** CPU promedio 29.2%, memoria pico 139.8 MB. Al descender el pico a los 4 minutos, la memoria y el CPU retornaron inmediatamente a su nivel basal, evidenciando resiliencia y recuperación inmediata. ([Ver Gráfico de Pico](file:///D:/workspace/PVS/Proyecto/qolqe-wallet/tests/performance/resultados/grafico_pico_recursos.png)).
+- **Estrés (500 VUs):** CPU promedio 67.3% con picos multicore de hasta 288% en el escalón de 500 VUs. Memoria RAM máxima de 214.8 MB sin fugas (*memory leaks*). ([Ver Gráfico de Estrés](file:///D:/workspace/PVS/Proyecto/qolqe-wallet/tests/performance/resultados/grafico_estres_recursos.png)).
+
+---
+
+### 4.9. Cuello de Botella Identificado y Causa Raíz
 - **Punto de Quiebre Identificado:** **500 VUs simultáneos**.
 - **Causa Raíz:** SQLite opera bajo un bloqueo exclusivo de escritor (*single-writer lock*), incluso en modo WAL. Con cientos de transacciones monetarias concurrentes (transferencias y recargas simultáneas), las transacciones entran en cola y superan el `busy_timeout`. A la vez, el proceso único de Uvicorn satura los hilos de CPU.
 - **Recomendaciones de Arquitectura:**
