@@ -40,17 +40,18 @@ test('CP-WEB-G1-03 Recarga exitosa con monto máximo y tope de bono @HU-G1-01 @R
 });
 
 test('CP-WEB-G1-04 Estimación dinámica de bonos en el formulario @HU-G1-01 @R-G1-02', async () => {
-  await recargas.seleccionarMonto(20);
-  await expect(recargas.bonoEstimado).toContainText(/no recibe bono/i);
-
-  await recargas.seleccionarMonto(30);
-  await expect(recargas.bonoEstimado).toContainText(/1.50/);
-
-  await recargas.seleccionarMonto(50);
-  await expect(recargas.bonoEstimado).toContainText(/2.50/);
-
-  await recargas.seleccionarMonto(100);
-  await expect(recargas.bonoEstimado).toContainText(/4.00/);
+  // Plan: specs/bono-estimado-recargas.md; asistencia de IA documentada en IA.md.
+  for (const [monto, mensaje] of [
+    [20, /no recibe bono/i],
+    [30, /1.50/],
+    [50, /2.50/],
+    [100, /4.00/],
+    [10, /no recibe bono/i],
+  ]) {
+    await recargas.seleccionarMonto(monto);
+    await expect(recargas.bonoEstimado).toContainText(mensaje);
+    await expect(recargas.comprobante).toBeHidden();
+  }
 });
 
 test('CP-WEB-G1-05 Celular inválido @HU-G1-01 @R-G1-01', async () => {

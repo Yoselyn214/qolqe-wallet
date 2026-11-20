@@ -12,6 +12,7 @@ class RecargasPage {
     this.celular = page.getByTestId('comprobante-celular');
     this.monto = page.getByTestId('comprobante-monto');
     this.bono = page.getByTestId('comprobante-bono');
+    this.bonoEstimado = page.getByTestId('bono-estimado');
     this.saldo = page.getByTestId('comprobante-saldo');
     this.fecha = page.getByTestId('comprobante-fecha');
     this.bonoEstimado = page.getByTestId('bono-estimado');
@@ -31,7 +32,6 @@ class RecargasPage {
     await this.seleccionarMonto(monto);
     await this.page.getByTestId('boton-recargar').click();
   }
-
   async programar(celular, monto, dia, alias = '') {
     await this.page.getByTestId('input-programada-celular').fill(celular);
     await this.page.getByTestId('select-programada-monto').selectOption(String(monto));

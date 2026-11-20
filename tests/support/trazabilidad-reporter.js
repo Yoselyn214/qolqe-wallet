@@ -16,6 +16,7 @@ class TrazabilidadReporter {
       hu: test.title.match(/@HU-G1-\d+(?![\d-])/g) || [],
       reglas: test.title.match(/@R-G1-\d+/g) || [],
       etiquetas: test.title.match(/@[\w-]+/g) || [],
+      endpoints: test.title.match(/@endpoint-[\w-]+/g) || [],
       resultado: result.status,
       duracionMs: result.duration,
       errores: result.errors.map(error => error.message),

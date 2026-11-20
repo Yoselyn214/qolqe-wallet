@@ -31,6 +31,9 @@ mcp-servers:
     args:
       - playwright
       - run-test-mcp-server
+    env:
+      PLAYWRIGHT_MCP_USE_SYSTEM_CHROME: "true"
+      CON_EVIDENCIA: "false"
     tools:
       - "*"
 ---

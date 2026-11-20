@@ -2,7 +2,7 @@
 const { test, expect } = require('@playwright/test');
 const { preparar } = require('../support/api');
 
-test("CP-G1-01 Recargar S/ 10 y descontar el saldo @recargas @HU-G1-01", async ({ request }) => {
+test("CP-G1-01 Recargar S/ 10 y descontar el saldo @recargas @HU-G1-01 @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas'].join('/'); data = undefined; params = {};
@@ -24,7 +24,7 @@ test("CP-G1-01 Recargar S/ 10 y descontar el saldo @recargas @HU-G1-01", async (
   expect(response.saldo).toEqual('1490.00');
 });
 
-test("CP-G1-02 Recarga exitosa a un número válido por S/ 5 @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-VALID", async ({ request }) => {
+test("CP-G1-02 Recarga exitosa a un número válido por S/ 5 @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-VALID @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas'].join('/'); data = undefined; params = {};
@@ -36,7 +36,7 @@ test("CP-G1-02 Recarga exitosa a un número válido por S/ 5 @recargas @HU-G1-01
   expect(response.monto).toEqual('5.00');
 });
 
-test("CP-G1-03 Recarga exitosa a un número válido por S/ 10 @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-VALID", async ({ request }) => {
+test("CP-G1-03 Recarga exitosa a un número válido por S/ 10 @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-VALID @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas'].join('/'); data = undefined; params = {};
@@ -48,7 +48,7 @@ test("CP-G1-03 Recarga exitosa a un número válido por S/ 10 @recargas @HU-G1-0
   expect(response.monto).toEqual('10.00');
 });
 
-test("CP-G1-04 Recarga exitosa a un número válido por S/ 20 @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-VALID", async ({ request }) => {
+test("CP-G1-04 Recarga exitosa a un número válido por S/ 20 @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-VALID @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas'].join('/'); data = undefined; params = {};
@@ -60,7 +60,7 @@ test("CP-G1-04 Recarga exitosa a un número válido por S/ 20 @recargas @HU-G1-0
   expect(response.monto).toEqual('20.00');
 });
 
-test("CP-G1-05 Recarga exitosa a un número válido por S/ 30 @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-VALID", async ({ request }) => {
+test("CP-G1-05 Recarga exitosa a un número válido por S/ 30 @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-VALID @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas'].join('/'); data = undefined; params = {};
@@ -72,7 +72,7 @@ test("CP-G1-05 Recarga exitosa a un número válido por S/ 30 @recargas @HU-G1-0
   expect(response.monto).toEqual('30.00');
 });
 
-test("CP-G1-06 Recarga exitosa a un número válido por S/ 50 @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-VALID", async ({ request }) => {
+test("CP-G1-06 Recarga exitosa a un número válido por S/ 50 @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-VALID @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas'].join('/'); data = undefined; params = {};
@@ -84,7 +84,7 @@ test("CP-G1-06 Recarga exitosa a un número válido por S/ 50 @recargas @HU-G1-0
   expect(response.monto).toEqual('50.00');
 });
 
-test("CP-G1-07 Recarga exitosa a un número válido por S/ 100 @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-VALID", async ({ request }) => {
+test("CP-G1-07 Recarga exitosa a un número válido por S/ 100 @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-VALID @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas'].join('/'); data = undefined; params = {};
@@ -96,7 +96,7 @@ test("CP-G1-07 Recarga exitosa a un número válido por S/ 100 @recargas @HU-G1-
   expect(response.monto).toEqual('100.00');
 });
 
-test("CP-G1-08 Rechazar celular 899999999 y monto 50 @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-ERROR", async ({ request }) => {
+test("CP-G1-08 Rechazar celular 899999999 y monto 50 @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-ERROR @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let datos;
@@ -115,7 +115,7 @@ test("CP-G1-08 Rechazar celular 899999999 y monto 50 @recargas @HU-G1-01 @R-G1-0
   expect(response.saldo).toEqual('1500.00');
 });
 
-test("CP-G1-09 Rechazar celular 99999999 y monto 50 @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-ERROR", async ({ request }) => {
+test("CP-G1-09 Rechazar celular 99999999 y monto 50 @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-ERROR @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let datos;
@@ -134,7 +134,7 @@ test("CP-G1-09 Rechazar celular 99999999 y monto 50 @recargas @HU-G1-01 @R-G1-01
   expect(response.saldo).toEqual('1500.00');
 });
 
-test("CP-G1-10 Rechazar celular 999999999 y monto 0 @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-ERROR", async ({ request }) => {
+test("CP-G1-10 Rechazar celular 999999999 y monto 0 @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-ERROR @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let datos;
@@ -153,7 +153,7 @@ test("CP-G1-10 Rechazar celular 999999999 y monto 0 @recargas @HU-G1-01 @R-G1-01
   expect(response.saldo).toEqual('1500.00');
 });
 
-test("CP-G1-11 Rechazar celular 999999999 y monto 15 @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-ERROR", async ({ request }) => {
+test("CP-G1-11 Rechazar celular 999999999 y monto 15 @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-ERROR @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let datos;
@@ -172,7 +172,7 @@ test("CP-G1-11 Rechazar celular 999999999 y monto 15 @recargas @HU-G1-01 @R-G1-0
   expect(response.saldo).toEqual('1500.00');
 });
 
-test("CP-G1-12 Rechazar celular 999999999 y monto -15 @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-ERROR", async ({ request }) => {
+test("CP-G1-12 Rechazar celular 999999999 y monto -15 @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-ERROR @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let datos;
@@ -191,7 +191,7 @@ test("CP-G1-12 Rechazar celular 999999999 y monto -15 @recargas @HU-G1-01 @R-G1-
   expect(response.saldo).toEqual('1500.00');
 });
 
-test("CP-G1-13 Rechazar celular 999999999 y monto 50.5 @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-ERROR", async ({ request }) => {
+test("CP-G1-13 Rechazar celular 999999999 y monto 50.5 @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-ERROR @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let datos;
@@ -210,7 +210,7 @@ test("CP-G1-13 Rechazar celular 999999999 y monto 50.5 @recargas @HU-G1-01 @R-G1
   expect(response.saldo).toEqual('1500.00');
 });
 
-test("CP-G1-14 Rechazar celular 999999999 y monto cinco @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-ERROR", async ({ request }) => {
+test("CP-G1-14 Rechazar celular 999999999 y monto cinco @recargas @HU-G1-01 @R-G1-01 @HU-G1-01-CA1-ERROR @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let datos;
@@ -229,7 +229,7 @@ test("CP-G1-14 Rechazar celular 999999999 y monto cinco @recargas @HU-G1-01 @R-G
   expect(response.saldo).toEqual('1500.00');
 });
 
-test("CP-G1-15 Validar el monto descontado de la cuenta, el bono aplicado y el SMS @recargas @HU-G1-01 @HU-G1-01-CA2", async ({ request }) => {
+test("CP-G1-15 Validar el monto descontado de la cuenta, el bono aplicado y el SMS @recargas @HU-G1-01 @HU-G1-01-CA2 @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas'].join('/'); data = undefined; params = {};
@@ -254,7 +254,7 @@ test("CP-G1-15 Validar el monto descontado de la cuenta, el bono aplicado y el S
   expect(response[0].mensaje).toContain('2.50');
 });
 
-test("CP-G1-16 Bono desde S/ 30 con tope de S/ 4 para monto 5 @recargas @HU-G1-01 @R-G1-02", async ({ request }) => {
+test("CP-G1-16 Bono desde S/ 30 con tope de S/ 4 para monto 5 @recargas @HU-G1-01 @R-G1-02 @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas'].join('/'); data = undefined; params = {};
@@ -265,7 +265,7 @@ test("CP-G1-16 Bono desde S/ 30 con tope de S/ 4 para monto 5 @recargas @HU-G1-0
   expect(response.bono).toEqual('0.00');
 });
 
-test("CP-G1-17 Bono desde S/ 30 con tope de S/ 4 para monto 10 @recargas @HU-G1-01 @R-G1-02", async ({ request }) => {
+test("CP-G1-17 Bono desde S/ 30 con tope de S/ 4 para monto 10 @recargas @HU-G1-01 @R-G1-02 @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas'].join('/'); data = undefined; params = {};
@@ -276,7 +276,7 @@ test("CP-G1-17 Bono desde S/ 30 con tope de S/ 4 para monto 10 @recargas @HU-G1-
   expect(response.bono).toEqual('0.00');
 });
 
-test("CP-G1-18 Bono desde S/ 30 con tope de S/ 4 para monto 20 @recargas @HU-G1-01 @R-G1-02", async ({ request }) => {
+test("CP-G1-18 Bono desde S/ 30 con tope de S/ 4 para monto 20 @recargas @HU-G1-01 @R-G1-02 @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas'].join('/'); data = undefined; params = {};
@@ -287,7 +287,7 @@ test("CP-G1-18 Bono desde S/ 30 con tope de S/ 4 para monto 20 @recargas @HU-G1-
   expect(response.bono).toEqual('0.00');
 });
 
-test("CP-G1-19 Bono desde S/ 30 con tope de S/ 4 para monto 30 @recargas @HU-G1-01 @R-G1-02", async ({ request }) => {
+test("CP-G1-19 Bono desde S/ 30 con tope de S/ 4 para monto 30 @recargas @HU-G1-01 @R-G1-02 @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas'].join('/'); data = undefined; params = {};
@@ -298,7 +298,7 @@ test("CP-G1-19 Bono desde S/ 30 con tope de S/ 4 para monto 30 @recargas @HU-G1-
   expect(response.bono).toEqual('1.50');
 });
 
-test("CP-G1-20 Bono desde S/ 30 con tope de S/ 4 para monto 50 @recargas @HU-G1-01 @R-G1-02", async ({ request }) => {
+test("CP-G1-20 Bono desde S/ 30 con tope de S/ 4 para monto 50 @recargas @HU-G1-01 @R-G1-02 @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas'].join('/'); data = undefined; params = {};
@@ -309,7 +309,7 @@ test("CP-G1-20 Bono desde S/ 30 con tope de S/ 4 para monto 50 @recargas @HU-G1-
   expect(response.bono).toEqual('2.50');
 });
 
-test("CP-G1-21 Bono desde S/ 30 con tope de S/ 4 para monto 100 @recargas @HU-G1-01 @R-G1-02", async ({ request }) => {
+test("CP-G1-21 Bono desde S/ 30 con tope de S/ 4 para monto 100 @recargas @HU-G1-01 @R-G1-02 @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas'].join('/'); data = undefined; params = {};
@@ -320,7 +320,7 @@ test("CP-G1-21 Bono desde S/ 30 con tope de S/ 4 para monto 100 @recargas @HU-G1
   expect(response.bono).toEqual('4.00');
 });
 
-test("CP-G1-22 Rechazar la sexta recarga manual sin descontar saldo @recargas @HU-G1-01 @R-G1-03", async ({ request }) => {
+test("CP-G1-22 Rechazar la sexta recarga manual sin descontar saldo @recargas @HU-G1-01 @R-G1-03 @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas'].join('/'); data = undefined; params = {};
@@ -361,7 +361,7 @@ test("CP-G1-22 Rechazar la sexta recarga manual sin descontar saldo @recargas @H
   expect(response.saldo).toEqual('1475.00');
 });
 
-test("CP-G1-23 Una recarga programada cuenta junto a cuatro manuales @recargas @HU-G1-01 @R-G1-03", async ({ request }) => {
+test("CP-G1-23 Una recarga programada cuenta junto a cuatro manuales @recargas @HU-G1-01 @R-G1-03 @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let fecha, token;
@@ -421,7 +421,7 @@ test("CP-G1-23 Una recarga programada cuenta junto a cuatro manuales @recargas @
   expect(response.codigo).toEqual('LIMITE_RECARGAS');
 });
 
-test("CP-G1-24 Permitir recargar al mismo número al día siguiente @recargas @HU-G1-01 @R-G1-03", async ({ request }) => {
+test("CP-G1-24 Permitir recargar al mismo número al día siguiente @recargas @HU-G1-01 @R-G1-03 @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let token;
@@ -481,7 +481,7 @@ test("CP-G1-24 Permitir recargar al mismo número al día siguiente @recargas @H
   expect(res.status(), JSON.stringify(response)).toBe(201);
 });
 
-test("CP-G1-25 Aceptar tres activas y rechazar la cuarta sin contar las pausadas @recargas @HU-G1-03 @R-G1-04", async ({ request }) => {
+test("CP-G1-25 Aceptar tres activas y rechazar la cuarta sin contar las pausadas @recargas @HU-G1-03 @R-G1-04 @endpoint-post-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let activaId, activas, pausadaId, pausadas;
@@ -519,7 +519,7 @@ test("CP-G1-25 Aceptar tres activas y rechazar la cuarta sin contar las pausadas
   expect(response.codigo).toEqual('LIMITE_PROGRAMADAS');
 });
 
-test("CP-G1-26 Pausar libera un cupo pero reanudar no permite superar tres activas @recargas @HU-G1-03 @R-G1-04 @HU-G1-05", async ({ request }) => {
+test("CP-G1-26 Pausar libera un cupo pero reanudar no permite superar tres activas @recargas @HU-G1-03 @R-G1-04 @HU-G1-05 @endpoint-post-recargas-programadas-pausar @endpoint-post-recargas-programadas-reanudar", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let activaId, activas, activasFinales, pausadaId, pausadas, siguePausada;
@@ -569,7 +569,7 @@ test("CP-G1-26 Pausar libera un cupo pero reanudar no permite superar tres activ
   expect(siguePausada).toHaveLength(1);
 });
 
-test("CP-G1-27 Validar el día de programación 1 @recargas @HU-G1-03 @R-G1-05", async ({ request }) => {
+test("CP-G1-27 Validar el día de programación 1 @recargas @HU-G1-03 @R-G1-05 @endpoint-post-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas/programadas'].join('/'); data = undefined; params = {};
@@ -580,7 +580,7 @@ test("CP-G1-27 Validar el día de programación 1 @recargas @HU-G1-03 @R-G1-05",
   expect(response).toMatchObject({ dia: 1, estado: 'ACTIVA' });
 });
 
-test("CP-G1-28 Validar el día de programación 28 @recargas @HU-G1-03 @R-G1-05", async ({ request }) => {
+test("CP-G1-28 Validar el día de programación 28 @recargas @HU-G1-03 @R-G1-05 @endpoint-post-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas/programadas'].join('/'); data = undefined; params = {};
@@ -591,7 +591,7 @@ test("CP-G1-28 Validar el día de programación 28 @recargas @HU-G1-03 @R-G1-05"
   expect(response).toMatchObject({ dia: 28, estado: 'ACTIVA' });
 });
 
-test("CP-G1-29 Validar el día de programación 0 @recargas @HU-G1-03 @R-G1-05", async ({ request }) => {
+test("CP-G1-29 Validar el día de programación 0 @recargas @HU-G1-03 @R-G1-05 @endpoint-post-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas/programadas'].join('/'); data = undefined; params = {};
@@ -602,7 +602,7 @@ test("CP-G1-29 Validar el día de programación 0 @recargas @HU-G1-03 @R-G1-05",
   expect(response).toMatchObject({ codigo: 'PROGRAMACION_INVALIDA' });
 });
 
-test("CP-G1-30 Validar el día de programación 29 @recargas @HU-G1-03 @R-G1-05", async ({ request }) => {
+test("CP-G1-30 Validar el día de programación 29 @recargas @HU-G1-03 @R-G1-05 @endpoint-post-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas/programadas'].join('/'); data = undefined; params = {};
@@ -613,7 +613,7 @@ test("CP-G1-30 Validar el día de programación 29 @recargas @HU-G1-03 @R-G1-05"
   expect(response).toMatchObject({ codigo: 'PROGRAMACION_INVALIDA' });
 });
 
-test("CP-G1-31 Rechazar duplicados activos y pausados y permitir recrear tras eliminar @recargas @HU-G1-03 @R-G1-05", async ({ request }) => {
+test("CP-G1-31 Rechazar duplicados activos y pausados y permitir recrear tras eliminar @recargas @HU-G1-03 @R-G1-05 @endpoint-post-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let id;
@@ -651,7 +651,7 @@ test("CP-G1-31 Rechazar duplicados activos y pausados y permitir recrear tras el
   expect(res.status(), JSON.stringify(response)).toBe(201);
 });
 
-test("CP-G1-32 Permitir mismo celular con otro día y otro celular con el mismo día @recargas @HU-G1-03 @R-G1-05", async ({ request }) => {
+test("CP-G1-32 Permitir mismo celular con otro día y otro celular con el mismo día @recargas @HU-G1-03 @R-G1-05 @endpoint-post-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let activaId, activas, pausadaId, pausadas;
@@ -687,7 +687,7 @@ test("CP-G1-32 Permitir mismo celular con otro día y otro celular con el mismo 
   expect(res.status(), JSON.stringify(response)).toBe(201);
 });
 
-test("CP-G1-33 El límite alcanzado por un número no bloquea otro número @recargas @HU-G1-01 @R-G1-03", async ({ request }) => {
+test("CP-G1-33 El límite alcanzado por un número no bloquea otro número @recargas @HU-G1-01 @R-G1-03 @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas'].join('/'); data = undefined; params = {};
@@ -734,7 +734,7 @@ test("CP-G1-33 El límite alcanzado por un número no bloquea otro número @reca
   expect(response.saldo).toEqual('1470.00');
 });
 
-test("CP-G1-34 Una programada no puede superar cinco recargas manuales del mismo día @recargas @HU-G1-01 @R-G1-03 @HU-G1-07 @HU-G1-07-CA3", async ({ request }) => {
+test("CP-G1-34 Una programada no puede superar cinco recargas manuales del mismo día @recargas @HU-G1-01 @R-G1-03 @HU-G1-07 @HU-G1-07-CA3 @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let activasSemilla, debitos, fecha, limitada, programadas, recargasAntes, recargasDespues, saldoAntes, token;
@@ -848,7 +848,7 @@ test("CP-G1-34 Una programada no puede superar cinco recargas manuales del mismo
   expect(response[0].mensaje).toContain('máximo');
 });
 
-test("CP-G1-35 Saldo insuficiente no registra recarga ni descuenta dinero @recargas @HU-G1-01 @HU-G1-01-CA3", async ({ request }) => {
+test("CP-G1-35 Saldo insuficiente no registra recarga ni descuenta dinero @recargas @HU-G1-01 @HU-G1-01-CA3 @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let antes;
@@ -880,7 +880,7 @@ test("CP-G1-35 Saldo insuficiente no registra recarga ni descuenta dinero @recar
   expect(response).toEqual(antes);
 });
 
-test("CP-G1-36 Saldo exacto permite recargar y termina en cero @recargas @HU-G1-01 @HU-G1-01-CA3", async ({ request }) => {
+test("CP-G1-36 Saldo exacto permite recargar y termina en cero @recargas @HU-G1-01 @HU-G1-01-CA3 @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/pruebas/saldo'].join('/'); data = undefined; params = {};
@@ -901,7 +901,7 @@ test("CP-G1-36 Saldo exacto permite recargar y termina en cero @recargas @HU-G1-
   expect(response.saldo).toEqual('0.00');
 });
 
-test("CP-G1-37 Configuración publica montos y parámetros del bono según requisitos @recargas @HU-G1-01 @configuracion", async ({ request }) => {
+test("CP-G1-37 Configuración publica montos y parámetros del bono según requisitos @recargas @HU-G1-01 @configuracion @endpoint-get-recargas-configuracion", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas/configuracion'].join('/'); data = undefined; params = {};
@@ -913,7 +913,7 @@ test("CP-G1-37 Configuración publica montos y parámetros del bono según requi
   expect(response.max_recargas_diarias_mismo_numero).toEqual(5);
 });
 
-test("CP-G1-38 Historial devuelve las últimas veinte recargas con campos y orden correctos @recargas @HU-G1-02", async ({ request }) => {
+test("CP-G1-38 Historial devuelve las últimas veinte recargas con campos y orden correctos @recargas @HU-G1-02 @endpoint-get-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let codigos, creadas, esperadas;
@@ -1160,7 +1160,7 @@ test("CP-G1-38 Historial devuelve las últimas veinte recargas con campos y orde
   expect(codigos.every((x, i) => codigos.indexOf(x) == i)).toBeTruthy();
 });
 
-test("CP-G1-39 Alias omitido es opcional @recargas @HU-G1-03 @HU-G1-03-CA1", async ({ request }) => {
+test("CP-G1-39 Alias omitido es opcional @recargas @HU-G1-03 @HU-G1-03-CA1 @endpoint-post-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas/programadas'].join('/'); data = undefined; params = {};
@@ -1171,7 +1171,7 @@ test("CP-G1-39 Alias omitido es opcional @recargas @HU-G1-03 @HU-G1-03-CA1", asy
   expect(response.alias == null).toBeTruthy();
 });
 
-test("CP-G1-40 Alias de veinte caracteres es válido @recargas @HU-G1-03 @HU-G1-03-CA1", async ({ request }) => {
+test("CP-G1-40 Alias de veinte caracteres es válido @recargas @HU-G1-03 @HU-G1-03-CA1 @endpoint-post-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas/programadas'].join('/'); data = undefined; params = {};
@@ -1182,7 +1182,7 @@ test("CP-G1-40 Alias de veinte caracteres es válido @recargas @HU-G1-03 @HU-G1-
   expect(response.alias).toEqual('12345678901234567890');
 });
 
-test("CP-G1-41 Alias de veintiún caracteres se rechaza @recargas @HU-G1-03 @HU-G1-03-CA1", async ({ request }) => {
+test("CP-G1-41 Alias de veintiún caracteres se rechaza @recargas @HU-G1-03 @HU-G1-03-CA1 @endpoint-post-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas/programadas'].join('/'); data = undefined; params = {};
@@ -1193,7 +1193,7 @@ test("CP-G1-41 Alias de veintiún caracteres se rechaza @recargas @HU-G1-03 @HU-
   expect(response.codigo).toEqual('PROGRAMACION_INVALIDA');
 });
 
-test("CP-G1-42 Celular inválido al programar @recargas @HU-G1-03 @HU-G1-03-CA1", async ({ request }) => {
+test("CP-G1-42 Celular inválido al programar @recargas @HU-G1-03 @HU-G1-03-CA1 @endpoint-post-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas/programadas'].join('/'); data = undefined; params = {};
@@ -1204,7 +1204,7 @@ test("CP-G1-42 Celular inválido al programar @recargas @HU-G1-03 @HU-G1-03-CA1"
   expect(response.codigo).toEqual('PROGRAMACION_INVALIDA');
 });
 
-test("CP-G1-43 Monto no permitido al programar @recargas @HU-G1-03 @HU-G1-03-CA1", async ({ request }) => {
+test("CP-G1-43 Monto no permitido al programar @recargas @HU-G1-03 @HU-G1-03-CA1 @endpoint-post-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   path = ['api/recargas/programadas'].join('/'); data = undefined; params = {};
@@ -1215,7 +1215,7 @@ test("CP-G1-43 Monto no permitido al programar @recargas @HU-G1-03 @HU-G1-03-CA1
   expect(response.codigo).toEqual('PROGRAMACION_INVALIDA');
 });
 
-test("CP-G1-44 Próxima ejecución desde 2026-01-10 para día 15 @recargas @HU-G1-03 @HU-G1-03-CA2", async ({ request }) => {
+test("CP-G1-44 Próxima ejecución desde 2026-01-10 para día 15 @recargas @HU-G1-03 @HU-G1-03-CA2 @endpoint-post-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let id, token;
@@ -1241,7 +1241,7 @@ test("CP-G1-44 Próxima ejecución desde 2026-01-10 para día 15 @recargas @HU-G
   expect(response.estado).toEqual('ACTIVA');
 });
 
-test("CP-G1-45 Próxima ejecución desde 2026-01-15 para día 15 @recargas @HU-G1-03 @HU-G1-03-CA2", async ({ request }) => {
+test("CP-G1-45 Próxima ejecución desde 2026-01-15 para día 15 @recargas @HU-G1-03 @HU-G1-03-CA2 @endpoint-post-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let id, token;
@@ -1267,7 +1267,7 @@ test("CP-G1-45 Próxima ejecución desde 2026-01-15 para día 15 @recargas @HU-G
   expect(response.estado).toEqual('ACTIVA');
 });
 
-test("CP-G1-46 Próxima ejecución desde 2026-01-20 para día 15 @recargas @HU-G1-03 @HU-G1-03-CA2", async ({ request }) => {
+test("CP-G1-46 Próxima ejecución desde 2026-01-20 para día 15 @recargas @HU-G1-03 @HU-G1-03-CA2 @endpoint-post-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let id, token;
@@ -1293,7 +1293,7 @@ test("CP-G1-46 Próxima ejecución desde 2026-01-20 para día 15 @recargas @HU-G
   expect(response.estado).toEqual('ACTIVA');
 });
 
-test("CP-G1-47 Próxima ejecución desde 2026-12-20 para día 15 @recargas @HU-G1-03 @HU-G1-03-CA2", async ({ request }) => {
+test("CP-G1-47 Próxima ejecución desde 2026-12-20 para día 15 @recargas @HU-G1-03 @HU-G1-03-CA2 @endpoint-post-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let id, token;
@@ -1319,7 +1319,7 @@ test("CP-G1-47 Próxima ejecución desde 2026-12-20 para día 15 @recargas @HU-G
   expect(response.estado).toEqual('ACTIVA');
 });
 
-test("CP-G1-48 Listado muestra campos y resultado sin ejecuciones @recargas @HU-G1-04", async ({ request }) => {
+test("CP-G1-48 Listado muestra campos y resultado sin ejecuciones @recargas @HU-G1-04 @endpoint-get-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let encontrada, id, programada;
@@ -1339,7 +1339,7 @@ test("CP-G1-48 Listado muestra campos y resultado sin ejecuciones @recargas @HU-
   expect(programada).toMatchObject({ celular: '999888777', alias: 'Prueba', monto: '10.00', dia: 15, estado: 'ACTIVA', proxima_ejecucion: expect.any(String), ultimo_resultado: 'SIN_EJECUCIONES', ultimo_detalle: null, ultima_ejecucion_en: null, creada_en: expect.any(String) });
 });
 
-test("CP-G1-49 Editar monto alias y día recalcula fecha sin cambiar el celular @recargas @HU-G1-05 @HU-G1-05-CA1", async ({ request }) => {
+test("CP-G1-49 Editar monto alias y día recalcula fecha sin cambiar el celular @recargas @HU-G1-05 @HU-G1-05-CA1 @endpoint-put-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let encontrada, id, programada, token;
@@ -1377,7 +1377,7 @@ test("CP-G1-49 Editar monto alias y día recalcula fecha sin cambiar el celular 
   expect(programada.alias).toEqual('Nuevo');
 });
 
-test("CP-G1-50 Edición inválida no modifica la programada { monto: 15 } @recargas @HU-G1-05 @HU-G1-05-CA1", async ({ request }) => {
+test("CP-G1-50 Edición inválida no modifica la programada { monto: 15 } @recargas @HU-G1-05 @HU-G1-05-CA1 @endpoint-put-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let encontrada, id, original, programada;
@@ -1404,7 +1404,7 @@ test("CP-G1-50 Edición inválida no modifica la programada { monto: 15 } @recar
   expect(programada).toEqual(original);
 });
 
-test("CP-G1-51 Edición inválida no modifica la programada { dia: 29 } @recargas @HU-G1-05 @HU-G1-05-CA1", async ({ request }) => {
+test("CP-G1-51 Edición inválida no modifica la programada { dia: 29 } @recargas @HU-G1-05 @HU-G1-05-CA1 @endpoint-put-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let encontrada, id, original, programada;
@@ -1431,7 +1431,7 @@ test("CP-G1-51 Edición inválida no modifica la programada { dia: 29 } @recarga
   expect(programada).toEqual(original);
 });
 
-test("CP-G1-52 Edición inválida no modifica la programada { alias: '123456789012345678901' } @recargas @HU-G1-05 @HU-G1-05-CA1", async ({ request }) => {
+test("CP-G1-52 Edición inválida no modifica la programada { alias: '123456789012345678901' } @recargas @HU-G1-05 @HU-G1-05-CA1 @endpoint-put-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let encontrada, id, original, programada;
@@ -1458,7 +1458,7 @@ test("CP-G1-52 Edición inválida no modifica la programada { alias: '1234567890
   expect(programada).toEqual(original);
 });
 
-test("CP-G1-53 Rechazar transición inválida pausar @recargas @HU-G1-05 @HU-G1-05-CA3", async ({ request }) => {
+test("CP-G1-53 Rechazar transición inválida pausar @recargas @HU-G1-05 @HU-G1-05-CA3 @endpoint-post-recargas-programadas-pausar", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let id;
@@ -1481,7 +1481,7 @@ test("CP-G1-53 Rechazar transición inválida pausar @recargas @HU-G1-05 @HU-G1-
   expect(response.codigo).toEqual('ESTADO_INVALIDO');
 });
 
-test("CP-G1-54 Rechazar transición inválida reanudar @recargas @HU-G1-05 @HU-G1-05-CA3", async ({ request }) => {
+test("CP-G1-54 Rechazar transición inválida reanudar @recargas @HU-G1-05 @HU-G1-05-CA3 @endpoint-post-recargas-programadas-reanudar", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let id;
@@ -1499,7 +1499,7 @@ test("CP-G1-54 Rechazar transición inválida reanudar @recargas @HU-G1-05 @HU-G
   expect(response.codigo).toEqual('ESTADO_INVALIDO');
 });
 
-test("CP-G1-55 Pausada no se ejecuta y reanudar recalcula desde hoy @recargas @HU-G1-05 @HU-G1-05-CA2", async ({ request }) => {
+test("CP-G1-55 Pausada no se ejecuta y reanudar recalcula desde hoy @recargas @HU-G1-05 @HU-G1-05-CA2 @endpoint-post-recargas-programadas-reanudar", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let debitos, encontrada, id, programada, semillas, token;
@@ -1589,7 +1589,7 @@ test("CP-G1-55 Pausada no se ejecuta y reanudar recalcula desde hoy @recargas @H
   expect(response).toMatchObject({ estado: 'ACTIVA', proxima_ejecucion: '2026-02-15' });
 });
 
-test("CP-G1-56 Eliminar oculta la programada e impide futuras ejecuciones conservando historial @recargas @HU-G1-06", async ({ request }) => {
+test("CP-G1-56 Eliminar oculta la programada e impide futuras ejecuciones conservando historial @recargas @HU-G1-06 @endpoint-delete-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let debitos, historial, id, restantes, semillas, token;
@@ -1693,7 +1693,7 @@ test("CP-G1-56 Eliminar oculta la programada e impide futuras ejecuciones conser
   expect(restantes).toEqual(historial);
 });
 
-test("CP-G1-57 No ejecutar programada antes de su fecha @recargas @HU-G1-07 @HU-G1-07-CA1", async ({ request }) => {
+test("CP-G1-57 No ejecutar programada antes de su fecha @recargas @HU-G1-07 @HU-G1-07-CA1 @endpoint-post-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let debitos, encontrada, id, programada, semillas, token;
@@ -1773,7 +1773,7 @@ test("CP-G1-57 No ejecutar programada antes de su fecha @recargas @HU-G1-07 @HU-
   expect(programada.ultimo_resultado).toEqual('SIN_EJECUCIONES');
 });
 
-test("CP-G1-58 Programada por S/ 30 aplica bono y registra origen e historial @recargas @HU-G1-07 @HU-G1-07-CA2", async ({ request }) => {
+test("CP-G1-58 Programada por S/ 30 aplica bono y registra origen e historial @recargas @HU-G1-07 @HU-G1-07-CA2 @endpoint-post-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let debitos, encontrada, id, programada, propias, semillas, token;
@@ -1854,7 +1854,7 @@ test("CP-G1-58 Programada por S/ 30 aplica bono y registra origen e historial @r
   expect(propias[0]).toMatchObject({ monto: '30.00', bono: '1.50', origen: 'PROGRAMADA' });
 });
 
-test("CP-G1-59 Programada por S/ 50 aplica bono y registra origen e historial @recargas @HU-G1-07 @HU-G1-07-CA2", async ({ request }) => {
+test("CP-G1-59 Programada por S/ 50 aplica bono y registra origen e historial @recargas @HU-G1-07 @HU-G1-07-CA2 @endpoint-post-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let debitos, encontrada, id, programada, propias, semillas, token;
@@ -1935,7 +1935,7 @@ test("CP-G1-59 Programada por S/ 50 aplica bono y registra origen e historial @r
   expect(propias[0]).toMatchObject({ monto: '50.00', bono: '2.50', origen: 'PROGRAMADA' });
 });
 
-test("CP-G1-60 Programada por S/ 100 aplica bono y registra origen e historial @recargas @HU-G1-07 @HU-G1-07-CA2", async ({ request }) => {
+test("CP-G1-60 Programada por S/ 100 aplica bono y registra origen e historial @recargas @HU-G1-07 @HU-G1-07-CA2 @endpoint-post-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let debitos, encontrada, id, programada, propias, semillas, token;
@@ -2016,7 +2016,7 @@ test("CP-G1-60 Programada por S/ 100 aplica bono y registra origen e historial @
   expect(propias[0]).toMatchObject({ monto: '100.00', bono: '4.00', origen: 'PROGRAMADA' });
 });
 
-test("CP-G1-61 Fallo por saldo insuficiente conserva saldo informa SMS y avanza fecha @recargas @HU-G1-07 @HU-G1-07-CA3 @HU-G1-07-CA4", async ({ request }) => {
+test("CP-G1-61 Fallo por saldo insuficiente conserva saldo informa SMS y avanza fecha @recargas @HU-G1-07 @HU-G1-07-CA3 @HU-G1-07-CA4 @endpoint-post-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let debitos, encontrada, id, programada, propias, semillas, token;
@@ -2113,7 +2113,7 @@ test("CP-G1-61 Fallo por saldo insuficiente conserva saldo informa SMS y avanza 
   expect(response[0].mensaje).toContain('Saldo insuficiente');
 });
 
-test("CP-G1-62 Varios meses atrasados se ejecutan una sola vez y avanzan al próximo mes @recargas @HU-G1-07 @HU-G1-07-CA4", async ({ request }) => {
+test("CP-G1-62 Varios meses atrasados se ejecutan una sola vez y avanzan al próximo mes @recargas @HU-G1-07 @HU-G1-07-CA4 @endpoint-post-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let debitos, encontrada, id, programada, semillas, token;
@@ -2193,7 +2193,7 @@ test("CP-G1-62 Varios meses atrasados se ejecutan una sola vez y avanzan al pró
   expect(programada.proxima_ejecucion).toEqual('2026-05-15');
 });
 
-test("CP-G1-63 Procesar dos veces el mismo día no duplica recargas @recargas @HU-G1-07 @HU-G1-07-CA5", async ({ request }) => {
+test("CP-G1-63 Procesar dos veces el mismo día no duplica recargas @recargas @HU-G1-07 @HU-G1-07-CA5 @endpoint-post-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let debitos, historial, id, semillas, token;
@@ -2280,7 +2280,7 @@ test("CP-G1-63 Procesar dos veces el mismo día no duplica recargas @recargas @H
   expect(response.saldo).toEqual('1490.00');
 });
 
-test("CP-G1-64 Sin sesión no se permite get 'api/recargas' @recargas @seguridad-recargas @HU-G1-01", async ({ request }) => {
+test("CP-G1-64 Sin sesión no se permite get 'api/recargas' @recargas @seguridad-recargas @HU-G1-01 @endpoint-get-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   headers = {};
@@ -2291,7 +2291,7 @@ test("CP-G1-64 Sin sesión no se permite get 'api/recargas' @recargas @seguridad
   expect(response.codigo).toEqual('NO_AUTENTICADO');
 });
 
-test("CP-G1-65 Sin sesión no se permite post 'api/recargas' @recargas @seguridad-recargas @HU-G1-01", async ({ request }) => {
+test("CP-G1-65 Sin sesión no se permite post 'api/recargas' @recargas @seguridad-recargas @HU-G1-01 @endpoint-post-recargas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   headers = {};
@@ -2303,7 +2303,7 @@ test("CP-G1-65 Sin sesión no se permite post 'api/recargas' @recargas @segurida
   expect(response.codigo).toEqual('NO_AUTENTICADO');
 });
 
-test("CP-G1-66 Sin sesión no se permite get 'api/recargas/programadas' @recargas @seguridad-recargas @HU-G1-04", async ({ request }) => {
+test("CP-G1-66 Sin sesión no se permite get 'api/recargas/programadas' @recargas @seguridad-recargas @HU-G1-04 @endpoint-get-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   headers = {};
@@ -2314,7 +2314,7 @@ test("CP-G1-66 Sin sesión no se permite get 'api/recargas/programadas' @recarga
   expect(response.codigo).toEqual('NO_AUTENTICADO');
 });
 
-test("CP-G1-67 Sin sesión no se permite post 'api/recargas/programadas' @recargas @seguridad-recargas @HU-G1-03", async ({ request }) => {
+test("CP-G1-67 Sin sesión no se permite post 'api/recargas/programadas' @recargas @seguridad-recargas @HU-G1-03 @endpoint-post-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   headers = {};
@@ -2326,7 +2326,7 @@ test("CP-G1-67 Sin sesión no se permite post 'api/recargas/programadas' @recarg
   expect(response.codigo).toEqual('NO_AUTENTICADO');
 });
 
-test("CP-G1-68 Otro usuario no puede editar una programada de Ana @recargas @seguridad-recargas @HU-G1-05", async ({ request }) => {
+test("CP-G1-68 Otro usuario no puede editar una programada de Ana @recargas @seguridad-recargas @HU-G1-05 @endpoint-put-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let id, tokenBruno;
@@ -2351,7 +2351,7 @@ test("CP-G1-68 Otro usuario no puede editar una programada de Ana @recargas @seg
   expect(response.codigo).toEqual('PROGRAMADA_NO_ENCONTRADA');
 });
 
-test("CP-G1-69 Otro usuario no puede pausar una programada de Ana @recargas @seguridad-recargas @HU-G1-05", async ({ request }) => {
+test("CP-G1-69 Otro usuario no puede pausar una programada de Ana @recargas @seguridad-recargas @HU-G1-05 @endpoint-post-recargas-programadas-pausar", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let id, tokenBruno;
@@ -2376,7 +2376,7 @@ test("CP-G1-69 Otro usuario no puede pausar una programada de Ana @recargas @seg
   expect(response.codigo).toEqual('PROGRAMADA_NO_ENCONTRADA');
 });
 
-test("CP-G1-70 Otro usuario no puede reanudar una programada de Ana @recargas @seguridad-recargas @HU-G1-05", async ({ request }) => {
+test("CP-G1-70 Otro usuario no puede reanudar una programada de Ana @recargas @seguridad-recargas @HU-G1-05 @endpoint-post-recargas-programadas-reanudar", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let id, tokenBruno;
@@ -2401,7 +2401,7 @@ test("CP-G1-70 Otro usuario no puede reanudar una programada de Ana @recargas @s
   expect(response.codigo).toEqual('PROGRAMADA_NO_ENCONTRADA');
 });
 
-test("CP-G1-71 Otro usuario no puede eliminar una programada de Ana @recargas @seguridad-recargas @HU-G1-06", async ({ request }) => {
+test("CP-G1-71 Otro usuario no puede eliminar una programada de Ana @recargas @seguridad-recargas @HU-G1-06 @endpoint-delete-recargas-programadas", async ({ request }) => {
   let path, data, params, res, response; let headers = {};
   headers = await preparar(request);
   let id, tokenBruno;
