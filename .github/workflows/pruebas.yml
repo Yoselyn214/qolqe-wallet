@@ -2,9 +2,9 @@ name: Automatización de Pruebas - Qolqe Wallet (G1 Recargas)
 
 on:
   push:
-    branches: [main]
+    branches: [main, actualizacion]
   pull_request:
-    branches: [main]
+    branches: [main, actualizacion]
   workflow_dispatch:
     inputs:
       con_evidencias:
@@ -132,7 +132,7 @@ jobs:
       - name: "Instalar navegador Chromium para pruebas E2E"
         run: npx playwright install --with-deps chromium
 
-      - name: "Ejecutar pruebas Web E2E (features/web.feature con POM)"
+      - name: "Ejecutar pruebas Web E2E (tests/e2e/*.spec.js con POM)"
         id: run_web
         env:
           CON_EVIDENCIA: ${{ github.event.inputs.con_evidencias || 'true' }}
@@ -221,8 +221,8 @@ jobs:
           echo "| Quality Gate | Ámbito | Verificación | Estado |" >> $GITHUB_STEP_SUMMARY
           echo "|---|---|---|---|" >> $GITHUB_STEP_SUMMARY
           echo "| **Quality Gate 1** | Contrato OpenAPI (Schemathesis) | Fuzzing exhaustivo (460 casos) | ✅ Aprobado |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Quality Gate 2** | API Recargas (Playwright API) | 71 casos (64 ok, 7 defectos controlados) | ✅ Aprobado |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Quality Gate 3** | Web E2E (Playwright POM) | 17 casos (6 Común + 11 Recargas G1) | ✅ Aprobado |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Quality Gate 2** | API Recargas (tests/api/*.spec.js) | 71 casos (64 ok, 7 defectos controlados) | ✅ Aprobado |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Quality Gate 3** | Web E2E (tests/e2e/*.spec.js con POM) | 17 casos (6 Común + 11 Recargas G1) | ✅ Aprobado |" >> $GITHUB_STEP_SUMMARY
           echo "| **Quality Gate 4** | Rendimiento y SLAs (Grafana k6) | Validación de SLOs (p95 < 800ms / 1500ms) | ✅ Aprobado |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🔍 Trazabilidad y Calidad Integral" >> $GITHUB_STEP_SUMMARY
