@@ -132,7 +132,7 @@ jobs:
       - name: "Instalar navegador Chromium para pruebas E2E"
         run: npx playwright install --with-deps chromium
 
-      - name: "Ejecutar pruebas Web E2E (features/web.feature con POM)"
+      - name: "Ejecutar pruebas Web E2E (tests/e2e/*.spec.js)"
         env:
           CON_EVIDENCIA: ${{ github.event.inputs.con_evidencias || 'true' }}
         run: npm run test:e2e
@@ -155,9 +155,9 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Quality Gate | Ámbito | Casos | Estado |" >> $GITHUB_STEP_SUMMARY
           echo "|---|---|---|---|" >> $GITHUB_STEP_SUMMARY
-          echo "| **Quality Gate 1** | Contrato OpenAPI (Schemathesis) | Fuzzing exhaustivo | ✅ Aprobado |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Quality Gate 2** | API Recargas (features/api.feature) | 71 casos (64 ok, 7 defectos conocidos) | ✅ Aprobado |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Quality Gate 3** | Web E2E (features/web.feature con POM) | 17 casos (6 Común + 11 Recargas G1) | ✅ Aprobado |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Quality Gate 1** | Contrato OpenAPI (Schemathesis) | Fuzzing basado en OpenAPI | Ver estado del trabajo contrato |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Quality Gate 2** | API Recargas (tests/api/*.spec.js) | 71 casos G1 | Ver estado del trabajo pruebas-api |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Quality Gate 3** | Web E2E (tests/e2e/*.spec.js) | 17 CP documentados en features/web.feature | Ver estado del trabajo pruebas-web |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 🔍 Trazabilidad y Evidencias" >> $GITHUB_STEP_SUMMARY
           echo "- **Evidencias visuales solicitadas:** \`${{ github.event.inputs.con_evidencias || 'true' }}\`" >> $GITHUB_STEP_SUMMARY
