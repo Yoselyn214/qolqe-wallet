@@ -6,6 +6,8 @@ datos/
 .coverage
 htmlcov/
 reportes/
+.env
+.env.*
 .tools/
 
 node_modules/

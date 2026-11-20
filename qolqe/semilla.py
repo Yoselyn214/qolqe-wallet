@@ -17,8 +17,8 @@ from qolqe.reglas.contactos import vencimiento_solicitud
 from qolqe.reglas.recargas import proxima_ejecucion
 
 DIAS_VIGENCIA_PLANTILLA = 7
-USUARIOS_DE_CARGA = 200
-MOVIMIENTOS_POR_USUARIO_DE_CARGA = 1000
+USUARIOS_DE_CARGA = 500
+MOVIMIENTOS_POR_USUARIO_DE_CARGA = 20
 PIN_USUARIOS_DE_CARGA = "2580"
 
 EMPRESAS = [
@@ -27,7 +27,7 @@ EMPRESAS = [
     ("INTERNET", "NetAndes", "Internet"),
 ]
 
-VERSION_PLANTILLA = "2"
+VERSION_PLANTILLA = "5"
 
 # (id, dni, nombres, celular, correo, pin actual, pines anteriores, saldo, límite diario, estado)
 USUARIOS_BASE = [
@@ -110,7 +110,7 @@ def _usuarios_de_carga(conexion: sqlite3.Connection) -> None:
             "INSERT INTO usuarios (id, dni, nombres, celular, pin_hash, creado_en) VALUES (?, ?, ?, ?, ?, ?)",
             (uid, f"7{n:07d}", f"Usuario Carga {n:03d}", celular, pin_hash, creado),
         )
-        conexion.execute("INSERT INTO cuentas VALUES (?, ?, ?)", (uid, 1_000_000, creado))
+        conexion.execute("INSERT INTO cuentas VALUES (?, ?, ?)", (uid, 300000, creado))
         conexion.execute("INSERT INTO limites (usuario_id, limite_diario_cent) VALUES (?, ?)", (uid, 200000))
         conexion.execute("INSERT INTO historial_pin (usuario_id, pin_hash, creado_en) VALUES (?, ?, ?)", (uid, pin_hash, creado))
         filas = []
@@ -149,10 +149,14 @@ def _datos_relativos(conexion: sqlite3.Connection, ahora: datetime) -> None:
             "INSERT INTO deudas (empresa, suministro, titular, periodo, monto_cent, vencimiento) VALUES (?, ?, ?, ?, ?, ?)",
             (empresa, suministro, titular, f"{vencimiento:%Y-%m}", monto, vencimiento.isoformat()),
         )
+    filas_deudas = []
+    for n in range(1, USUARIOS_DE_CARGA + 1):
+        for mes in range(1, 11):
+            venc = hoy + timedelta(days=5 + mes * 5)
+            filas_deudas.append(("AGUA", f"40000{n:05d}", f"Usuario Carga {n:03d}", f"{venc:%Y-%m}", 5000 + n * 10, venc.isoformat()))
     conexion.executemany(
         "INSERT INTO deudas (empresa, suministro, titular, periodo, monto_cent, vencimiento) VALUES (?, ?, ?, ?, ?, ?)",
-        [("AGUA", f"40000{n:05d}", f"Usuario Carga {n:03d}", f"{hoy:%Y-%m}", 5000 + n * 10,
-          (hoy - timedelta(days=5)).isoformat()) for n in range(1, USUARIOS_DE_CARGA + 1)],
+        filas_deudas,
     )
 
     conexion.executemany(

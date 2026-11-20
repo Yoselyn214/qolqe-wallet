@@ -9,7 +9,7 @@ class TrazabilidadReporter {
   onTestEnd(test, result) {
     if (test.parent.project()?.name === 'setup') return;
     const cp = test.title.match(/CP-WEB-G1-\d+|CP-WEB-COMUN-\d+|CP-G1-\d+|CP-AUTH-\d+|CP-SALUD-\d+/)?.[0];
-    this.results.push({
+    const item = {
       proyecto: test.parent.project()?.name,
       cp: cp || null,
       titulo: test.title,
@@ -24,7 +24,14 @@ class TrazabilidadReporter {
       pipeline: process.env.GITHUB_RUN_ID
         ? `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
         : null,
-    });
+    };
+
+    const idx = this.results.findIndex(r => (cp && r.cp === cp) || r.titulo === test.title);
+    if (idx >= 0) {
+      this.results[idx] = item;
+    } else {
+      this.results.push(item);
+    }
   }
 
   onEnd() {

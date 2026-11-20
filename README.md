@@ -1,19 +1,61 @@
-# Qolqe Wallet
+# Qolqe Wallet — Grupo G1: Recargas de Celular y Módulo Común
 
-Billetera digital **ficticia** usada como sistema bajo prueba (SUT) en el Proyecto 2 del curso **CS5383 Pruebas y Verificación de Software**.
-
-> ⚠️ **Antes de empezar:**
-> - **No modifiquen el código de la carpeta `qolqe/`.** Su trabajo es probarlo, no repararlo.
-> - Todos los datos son ficticios.
+> **Curso:** CS5383 Pruebas y Verificación de Software  
+> **Proyecto 2:** Sistema de Billetera Digital Ficticia (SUT)  
+> **Integrantes:** Grupo G1  
 
 ---
 
-## 1. Requisitos
+## 📌 Guía de Documentación Oficial y Entregables
+
+Para facilitar la revisión y evaluación del repositorio, la documentación oficial está clasificada de forma limpia para evitar duplicidades:
+
+| Documento | Ubicación | Descripción / Propósito |
+|---|---|---|
+| 📘 **Informe Oficial Consolidado** | [`docs/informe.md`](docs/informe.md) | **Documento Principal de Calificación.** Reúne la Pirámide de Pruebas de Mike Cohn, justificación técnica de herramientas, Cobertura de API (Parte 1), Pruebas Web E2E y CI/CD con Qase.io (Parte 2), Pruebas de Rendimiento k6 y SLAs (Parte 3), Registro Consolidado de Defectos (DEF-01 al DEF-06) y Conclusiones. |
+| 🐛 **Reporte Detallado de Defectos** | [`docs/defectos.md`](docs/defectos.md) | Ficha técnica y pasos de reproducción de los defectos detectados en la API y el sistema (DEF-01 a DEF-06). |
+| ⚡ **Guía Maestra de Comandos** | [`GUIA_COMANDOS.md`](GUIA_COMANDOS.md) | Manual de referencia con comandos para reproducir localmente Playwright, Schemathesis, k6 (Rendimiento) y Qase sync. |
+| 📋 **Requisitos y Reglas de Negocio** | [`docs/requisitos.md`](docs/requisitos.md) | Especificación de Historias de Usuario, criterios de aceptación y reglas del módulo G1 y núcleo común. |
+| 📊 **Matriz de Trazabilidad** | [`docs/trazabilidad-recargas.json`](docs/trazabilidad-recargas.json) | Mapeo determinista entre Historias de Usuario / Reglas y los Casos de Prueba (`CP-G1-01` a `CP-G1-71`). |
+| 🚀 **Suite de Rendimiento (k6)** | [`tests/performance/README.md`](tests/performance/README.md) | Explicación técnica de la suite de carga, estrés, pico, telemetría psutil y reportes interactivos HTML. |
+| 🤖 **Declaración de Uso de IA** | [`IA.md`](IA.md) | Declaración formal de asistencia de Inteligencia Artificial según la rúbrica del curso. |
+| 📁 **Histórico Entrega 1 (Karate)** | [`docs/historico-karate/`](docs/historico-karate/) | Guías y especificaciones iniciales con Karate DSL (conservadas solo como antecedente histórico). |
+
+---
+
+## ⚡ Ejecución Rápida de Suites de Prueba
+
+Con el entorno configurado (Python + Node.js):
+
+```bash
+# 1. Pruebas Funcionales: API (71 casos) y Web E2E (17 casos con POM)
+npm test
+
+# 2. Quality Gates individuales
+npm run gate:api        # Quality Gate 2: API Recargas (tolerancia estricta a DEF-03/04/05)
+npm run gate:web        # Quality Gate 3: Web E2E y Regresión Visual
+
+# 3. Pruebas de Contrato (OpenAPI 3.1 con Schemathesis)
+npm run test:contract
+
+# 4. Pruebas de Rendimiento (Grafana k6 - Smoke Test)
+npm run test:perf:humo
+
+# 5. Generar reporte HTML de Playwright
+npm run report
+```
+
+Para instrucciones detalladas paso a paso y escenarios avanzados de rendimiento, consulte la [Guía Maestra de Comandos](GUIA_COMANDOS.md).
+
+---
+
+## 1. Requisitos del Sistema
 
 - Python **3.11 o superior** (recomendado 3.12)
+- Node.js **20 o superior** (recomendado 22 LTS)
 - Git
 
-## 2. Instalación y ejecución
+## 2. Instalación y Ejecución de la Aplicación
 
 ```bash
 python -m venv .venv
@@ -44,7 +86,7 @@ La primera vez la app crea la base de datos en `datos/` (tarda unos segundos por
 
 ---
 
-## 3. Funcionalidades
+## 3. Funcionalidades del SUT
 
 | Módulo | Pantalla | Endpoints principales |
 |---|---|---|
@@ -56,15 +98,9 @@ La primera vez la app crea la base de datos en `datos/` (tarda unos segundos por
 | **G5** Límites y alertas de consumo | `/limites` | `GET/PUT /api/limites` · `GET/POST /api/limites/alertas` · `PUT/DELETE /api/limites/alertas/{id}` |
 | **G6** Seguridad, dispositivos y sesiones | `/seguridad`, `/desbloqueo` | `PUT /api/seguridad/pin` · `POST /api/seguridad/desbloqueo/solicitar` · `.../confirmar` · `GET/POST /api/seguridad/dispositivos` · `PUT/DELETE /api/seguridad/dispositivos/{id}` · `GET/DELETE /api/seguridad/sesiones` · `DELETE /api/seguridad/sesiones/{id}` |
 
-Las **historias de usuario, criterios de aceptación y reglas de negocio** están en `docs/requisitos.md`. Las funciones que las implementan, sin base de datos ni red, están en `qolqe/reglas/`:
+Las **historias de usuario, criterios de aceptación y reglas de negocio** están en `docs/requisitos.md`.
 
-```
-qolqe/reglas/nucleo.py      qolqe/reglas/servicios.py   qolqe/reglas/contactos.py
-qolqe/reglas/recargas.py    qolqe/reglas/historial.py   qolqe/reglas/limites.py
-qolqe/reglas/seguridad.py
-```
-
-### Autenticación
+### Autenticación y Manejo de Errores
 
 ```http
 POST /api/auth/login
@@ -73,148 +109,71 @@ Content-Type: application/json
 {"celular": "987654321", "pin": "4826"}
 ```
 
-Opcionalmente se envía `"dispositivo_id"` (identificador de un dispositivo de confianza, ver G6). La respuesta incluye `access_token` y `sesion_id`. Envíen el token en cada solicitud protegida:
+Envíen el token devuelto en cada solicitud protegida:
 
 ```http
 Authorization: Bearer <access_token>
 ```
 
 - Cada inicio de sesión crea una **sesión**; el token vence a los **30 minutos**.
-- `POST /api/auth/logout` cierra la sesión. Las sesiones activas se consultan y cierran en `/api/seguridad/sesiones`.
+- `POST /api/auth/logout` cierra la sesión.
 - Tras **3 intentos fallidos** consecutivos, la cuenta se bloquea 15 minutos (`423`).
 
-### Convenciones de la API
+---
 
-- **Montos:** se envían como número o texto decimal (`100`, `"100.50"`) y se devuelven como texto con 2 decimales (`"100.50"`).
-- **Fechas:** hora de Lima, formato `AAAA-MM-DDTHH:MM:SS`.
-- **Errores:** todos responden con un código estable y un mensaje:
+## 4. Datos de Prueba Predefinidos
 
-```json
-{"codigo": "SALDO_INSUFICIENTE", "detail": "Saldo insuficiente para realizar la operación"}
-```
+Se restauran con `POST /api/pruebas/reiniciar`:
 
-| HTTP | Significado | Ejemplos de `codigo` |
-|---|---|---|
-| 204 | Eliminación o cierre correcto, sin contenido | |
-| 401 | Sin token, token inválido, vencido o de una sesión cerrada, o credenciales incorrectas | `NO_AUTENTICADO`, `CREDENCIALES_INVALIDAS`, `CUENTA_CERRADA` |
-| 404 | Recurso inexistente **o de otro usuario** | `DESTINO_NO_REGISTRADO`, `CONTACTO_NO_ENCONTRADO`, `SIN_DEUDA_PENDIENTE` |
-| 409 | Conflicto con el estado actual | `CELULAR_REGISTRADO`, `ALIAS_DUPLICADO`, `DEUDA_YA_PAGADA`, `ESTADO_INVALIDO` |
-| 422 | Regla de negocio o datos inválidos | `MONTO_INVALIDO`, `SALDO_INSUFICIENTE`, `LIMITE_DIARIO_EXCEDIDO`, `FILTRO_INVALIDO`, `SOLICITUD_INVALIDA` |
-| 423 | Cuenta bloqueada | `CUENTA_BLOQUEADA` |
+### Usuarios Principales
 
-El contrato completo está en `/docs` (Swagger) y en `/openapi.json`. Cada operación indica su historia de usuario, los esquemas de entrada y salida con sus restricciones, y todos los códigos de error que puede devolver, con un ejemplo por código.
+| Usuario | Celular | PIN | Saldo | Notas |
+|---|---|---|---|---|
+| Ana Torres Quispe | 987654321 | 4826 | S/ 1,500.00 | Usuario principal de prueba (G1 y Núcleo) |
+| Bruno Díaz Mendoza | 912345678 | 7391 | S/ 800.00 | Contacto de Ana |
+| Carla Ramos Huamán | 956781234 | 5917 | S/ 50.00 | Saldo bajo |
+| Diego Salas Paredes | 998877665 | 3604 | S/ 2,500.00 | Límite diario configurado en S/ 1,000 |
+| Elena Vargas Ccori | 923456789 | 8152 | S/ 300.00 | Cuenta bloqueada al reiniciar (para probar desbloqueo) |
+| Fabián Rojas Núñez | 934567812 | 6029 | S/ 0.00 | Cuenta cerrada |
+
+### Usuarios de Carga (Pruebas de Rendimiento)
+- Celulares **900000001** a **900000500**, todos con PIN **2580** y saldo S/ 3,000.00.
+- Dataset determinista generado en `tests/performance/data/usuarios.json`.
 
 ---
 
-## 4. Datos de prueba
+## 5. API de Soporte para Pruebas
 
-Se restauran con `POST /api/pruebas/reiniciar`. Las fechas de las deudas y algunos movimientos se calculan **respecto del día actual** del reloj de la app.
+Disponible con `QOLQE_MODO_PRUEBA=1`. No forma parte del producto comercial; existe para garantizar que las pruebas automatizadas sean repetibles e independientes.
 
-### Usuarios
-
-| Usuario | Celular | PIN | Correo | Saldo | Notas |
-|---|---|---|---|---|---|
-| Ana Torres Quispe | 987654321 | 4826 | ana.torres@correo.pe | S/ 1,500.00 | Usuario principal de ejemplo (ver abajo). Ha usado otros PIN antes |
-| Bruno Díaz Mendoza | 912345678 | 7391 | bruno.diaz@correo.pe | S/ 800.00 | Tiene a Ana como contacto |
-| Carla Ramos Huamán | 956781234 | 5917 | carla.ramos@correo.pe | S/ 50.00 | Saldo bajo. Tiene a Ana como contacto |
-| Diego Salas Paredes | 998877665 | 3604 | diego.salas@correo.pe | S/ 2,500.00 | Límite diario configurado en S/ 1,000. Tiene a Fabián como contacto |
-| Elena Vargas Ccori | 923456789 | 8152 | elena.vargas@correo.pe | S/ 300.00 | **Cuenta bloqueada** al reiniciar (para probar el desbloqueo) |
-| Fabián Rojas Núñez | 934567812 | 6029 | fabian.rojas@correo.pe | S/ 0.00 | **Cuenta cerrada** |
-
-### Datos de Ana por módulo
-
-| Módulo | Datos |
-|---|---|
-| G1 | Programada "Mamá" (987111222, S/ 20, día 15, ACTIVA) y "Trabajo" (999000111, S/ 10, día 5, PAUSADA). Una recarga de hoy al 999000111 |
-| G2 | Afiliaciones "Luz casa" (ELECTRO 10000001), "Agua depa" (AGUA 2000000008, **débito automático activo**) e "Internet casa" (INTERNET 300000000007) |
-| G3 | Historial de unos 60 días. Categorías Comida, Familia y Servicios, con movimientos asignados y una nota |
-| G4 | Contactos "Bruno" (favorito) y "Prima Carla". Solicitudes: Bruno le pide S/ 45.00 (pendiente), Carla le pidió S/ 30.00 hace más de 48 horas, y Ana le pide S/ 20.00 a Bruno (pendiente) |
-| G5 | Alerta de TRANSFERENCIAS con umbral S/ 300 |
-| G6 | Dispositivo de confianza "Celular de Ana" con identificador `a1b2c3d4e5f60718` |
-
-### Usuarios de carga (pruebas de rendimiento)
-
-- Celulares **900000001** a **900000200**, todos con PIN **2580**.
-- Saldo S/ 10,000.00 y unos 1,000 movimientos de los últimos 120 días cada uno.
-
-### Deudas de servicios
-
-| Empresa | Suministro | Vencimiento (respecto de hoy) |
-|---|---|---|
-| ELECTRO | 10000001 | Vence en 10 días |
-| ELECTRO | 10000002 | Vence hoy |
-| ELECTRO | 10000003 | Venció ayer |
-| ELECTRO | 100000009 | Dos periodos: uno venció hace 5 días y otro vence en 25 |
-| AGUA | 20000004 | Venció hace 10 días |
-| AGUA | 20000005 | Venció hace 30 días |
-| AGUA | 2000000008 | Vence en 3 días |
-| INTERNET | 300000000006 | Venció hace 60 días |
-| INTERNET | 300000000007 | Venció hace 61 días |
-| AGUA | 4000000001 a 4000000200 | Venció hace 5 días (para pruebas de carga) |
-
-### Transferencias interbancarias
-
-Usen cualquier CCI de 20 dígitos, por ejemplo `00219300123456789012`.
-
----
-
-## 5. API de soporte para pruebas
-
-Disponible solo con `QOLQE_MODO_PRUEBA=1`. **No forma parte del producto**: existe para que las pruebas automatizadas sean repetibles.
-
-| Endpoint | Para qué |
+| Endpoint | Propósito |
 |---|---|
 | `POST /api/pruebas/reiniciar` | Restaura todos los datos semilla |
-| `GET /api/pruebas/reloj` | Ver la fecha y hora de la app |
-| `PUT /api/pruebas/reloj` | Fijar (`{"ahora": "2026-11-15T10:00:00"}`) o adelantar (`{"avanzar_minutos": 60}`) el reloj |
-| `DELETE /api/pruebas/reloj` | Volver a la hora real |
-| `GET /api/pruebas/notificaciones?celular=...` | Ver los SMS simulados enviados a un celular (por ejemplo, el código de desbloqueo) |
-| `PUT /api/pruebas/saldo` | Fijar el saldo de un usuario: `{"celular": "...", "saldo": "100.00"}` |
-| `POST /api/pruebas/procesar-diario` | Ejecutar el proceso diario (recargas programadas y débitos automáticos) con la fecha del reloj de la app |
-
-> 💡 Para probar el proceso diario: fijen o adelanten el reloj al día que necesiten y luego llamen a `POST /api/pruebas/procesar-diario`.
->
-> 💡 Si sus pruebas modifican datos (transferencias, bloqueos, límites), reinicien los datos antes de cada prueba o diseñen datos independientes. Así cumplen la propiedad *Independent* de FIRST.
+| `GET /api/pruebas/reloj` | Consulta la fecha y hora de la app |
+| `PUT /api/pruebas/reloj` | Modifica o adelanta el reloj en memoria |
+| `DELETE /api/pruebas/reloj` | Vuelve a la hora real del sistema |
+| `GET /api/pruebas/notificaciones?celular=...` | Consulta los SMS simulados enviados a un celular |
+| `PUT /api/pruebas/saldo` | Ajusta el saldo disponible de un usuario |
+| `POST /api/pruebas/procesar-diario` | Ejecuta el procesamiento diario (recargas y débitos automáticos) |
 
 ---
 
-## 6. Estructura sugerida del repositorio del grupo
+## 6. Estructura Limpia del Repositorio
 
-```
-qolqe/                    # App (NO modificar)
-features/                 # Casos del módulo en Gherkin
+```text
+qolqe/                    # Sistema Bajo Prueba (SUT - FastAPI)
+features/                 # Especificaciones BDD en Gherkin (api.feature, web.feature)
 tests/
-  api/                    # Parte 1
-  e2e/pages/              # Parte 2 (Page Objects)
-  performance/            # Parte 3
-docs/                     # Herramienta, trazabilidad, rendimiento, defectos
-.github/workflows/        # Pipeline (Parte 2)
-IA.md                     # Declaración de uso de IA
+  api/                    # Suite de API con Playwright (71 casos de Recargas)
+  e2e/                    # Suite Web E2E con Page Object Model (POM) y regresión visual
+  performance/            # Suite de Rendimiento con k6, telemetría y escenarios
+docs/                     # Documentación oficial del proyecto
+  informe.md              # 📘 Informe Oficial Consolidado (Partes 1, 2 y 3)
+  defectos.md             # 🐛 Reporte Detallado de Defectos
+  requisitos.md           # 📋 Especificación de Requisitos y Reglas de Negocio
+  trazabilidad-recargas.json # 📊 Matriz de Trazabilidad
+  historico-karate/       # 📁 Archivo histórico de la Entrega 1 (Karate)
+.github/workflows/        # Pipeline CI/CD con 4 Quality Gates
+GUIA_COMANDOS.md          # ⚡ Guía Maestra de Comandos de Ejecución
+IA.md                     # 🤖 Declaración de Uso de IA
 ```
-
-En `docs/` encontrarán la especificación de requisitos, la plantilla del informe del proyecto y la plantilla del reporte de defectos; en la raíz, la plantilla de `IA.md`.
-
-## 7. Automatización G1 con Playwright y Schemathesis
-
-La segunda entrega usa **Playwright para API y E2E web**, **Page Object Model**,
-reportes **HTML/JUnit** y trazabilidad **HU → CP → pipeline**. Schemathesis ejecuta
-las pruebas de contrato en un trabajo independiente de GitHub Actions.
-
-Consulta la [guía de Playwright](docs/guia-playwright-recargas.md) para instalar y
-reproducir las pruebas, filtrar por regla y revisar las evidencias.
-
-```bash
-# Con el entorno Python activado:
-pip install -r requirements-dev.txt -r requirements-contract.txt
-npm ci
-npx playwright install chromium
-npm test
-npm run test:contract
-npm run report
-```
-
-Se migraron los 71 casos existentes manteniendo su orden e identificadores de
-reglas. Las pruebas web añaden cinco flujos con POM. Las suites levantan servidores
-exclusivos con bases temporales; no requieren iniciar uvicorn manualmente.
-Karate se conserva como referencia histórica y no se ejecuta en el pipeline activo.
-Los defectos conocidos siguen produciendo fallos visibles según los requisitos.

@@ -9,9 +9,15 @@
     "test:contract": "node scripts/ejecutar_contrato.js",
     "gate:api": "node scripts/quality_gate_api.js",
     "gate:web": "node scripts/quality_gate_web.js",
+    "qase:sync": "node scripts/qase_sync.js",
+    "test:perf:humo": "k6 run tests/performance/scenarios/humo_validacion.js",
+    "test:perf:carga": "k6 run tests/performance/scenarios/carga_hora_punta.js",
+    "test:perf:pico": "k6 run tests/performance/scenarios/pico_campana.js",
+    "test:perf:estres": "k6 run tests/performance/scenarios/estres_campana.js",
     "report": "playwright show-report reportes/playwright/html"
   },
   "devDependencies": {
-    "@playwright/test": "1.58.2"
+    "@playwright/test": "1.58.2",
+    "playwright-qase-reporter": "^2.8.1"
   }
 }

@@ -187,6 +187,6 @@ puede actualizarlo; comprueba que corresponda a la ejecución que estás revisan
 Karate detiene cada escenario en su primera comprobación fallida, por lo que los
 pasos posteriores no se consideran verificados.
 
-La [guía de Karate](guia-karate-recargas.md) explica cómo ejecutar las pruebas y
-leer el reporte. El [resumen de recargas](resumen-pruebas-recargas.md) presenta
+La [guía de Karate](historico-karate/guia-karate-recargas.md) explica cómo ejecutar las pruebas y
+leer el reporte. El [resumen de recargas](historico-karate/resumen-pruebas-recargas.md) presenta
 los casos, los valores límite y los dos defectos seleccionados.
