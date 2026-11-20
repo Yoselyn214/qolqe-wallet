@@ -1,3 +1,7 @@
+> Este documento registra la revisión de la suite Karate de la primera entrega.
+> Para la automatización activa y el filtrado por endpoint, consulta la
+> [guía de Playwright y Schemathesis](guia-playwright-recargas.md).
+
 # Revisión de las pruebas de recargas
 
 Revisamos los casos de `api.feature` tomando como referencia la sección 4 de

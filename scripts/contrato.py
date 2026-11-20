@@ -27,17 +27,19 @@ def solicitar(path, data=None):
 def main():
     report = ROOT / 'reportes/contrato'
     report.mkdir(parents=True, exist_ok=True)
+    # Compartir UTF-8 entre ambos procesos evita errores de consola en Windows.
+    env = {**os.environ, 'PYTHONIOENCODING': 'utf-8', 'PYTHONUTF8': '1'}
     print('================================================================')
     print('[INFO] EJECUTANDO QUALITY GATE 1: PRUEBAS DE CONTRATO (SCHEMATHESIS)')
     print('================================================================')
     # El servidor se detiene incluso si falla el contrato o se interrumpe la ejecución.
     with tempfile.TemporaryFile() as log:
-        server = subprocess.Popen([sys.executable, str(ROOT / 'scripts/servidor_pruebas.py'), '--port', '8012'], cwd=ROOT, stdout=log, stderr=log)
+        server = subprocess.Popen([sys.executable, str(ROOT / 'scripts/servidor_pruebas.py'), '--port', '8012'], cwd=ROOT, env=env, stdout=log, stderr=log)
         try:
             for _ in range(120):
                 if server.poll() is not None:
                     log.seek(0)
-                    raise RuntimeError(log.read().decode())
+                    raise RuntimeError(log.read().decode('utf-8', errors='replace'))
                 try:
                     solicitar('/api/salud')
                     break
@@ -47,7 +49,6 @@ def main():
                 raise RuntimeError('La API de contrato no inició en 120 segundos')
             solicitar('/api/pruebas/reiniciar', {})
             token = solicitar('/api/auth/login', {'celular': '987654321', 'pin': '4826'})['access_token']
-            env = {**os.environ, 'PYTHONIOENCODING': 'utf-8', 'PYTHONUTF8': '1'}
             schemathesis_cmd = [
                 sys.executable, '-m', 'schemathesis.cli', 'run', BASE + '/openapi.json',
                 '--include-path-regex', '^/api/recargas(?:/.*)?$',

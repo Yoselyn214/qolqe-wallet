@@ -177,3 +177,14 @@ docs/                     # Documentación oficial del proyecto
 GUIA_COMANDOS.md          # ⚡ Guía Maestra de Comandos de Ejecución
 IA.md                     # 🤖 Declaración de Uso de IA
 ```
+
+## 7. Playwright y agentes MCP
+
+La configuración del servidor MCP de Playwright está en [`.vscode/mcp.json`](.vscode/mcp.json),
+y las definiciones de Planner, Generator y Healer están en [`.github/agents/`](.github/agents/).
+Consulta [la guía de IA con Playwright](docs/ia-playwright.md) para iniciar el servidor
+y probar los agentes. La [guía de automatización](docs/guia-playwright-recargas.md)
+describe la ejecución local de las suites web y API.
+
+Los casos E2E del módulo común están en `tests/e2e/comun.spec.js`; las pruebas se
+ejecutan con `npm test` o `npm run test:e2e`.

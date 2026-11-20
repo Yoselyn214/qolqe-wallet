@@ -65,7 +65,14 @@ module.exports = defineConfig({
   },
   projects: [
     { name: 'api', testMatch: 'api/**/*.spec.js' },
-    { name: 'web', testMatch: 'e2e/**/*.spec.js', use: { ...devices['Desktop Chrome'] } },
+    {
+      name: 'web',
+      testMatch: 'e2e/**/*.spec.js',
+      use: {
+        ...devices['Desktop Chrome'],
+        ...(process.env.PLAYWRIGHT_MCP_USE_SYSTEM_CHROME === 'true' ? { channel: 'chrome' } : {}),
+      },
+    },
   ],
   webServer: {
     command: `${pythonCmd} scripts/servidor_pruebas.py --port 8011`,
