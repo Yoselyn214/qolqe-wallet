@@ -1,189 +1,243 @@
-# Guía Maestra de Comandos de Pruebas: Qolqe Wallet
+# GUÍA MAESTRA DE COMANDOS DE PRUEBAS: QOLQE WALLET
+**Proyecto:** Verificación Integral de API, Web E2E y Rendimiento (Módulo Recargas G1 y Núcleo Común)  
+**Repositorio:** [https://github.com/Yoselyn214/qolqe-wallet](https://github.com/Yoselyn214/qolqe-wallet)  
+**Directorio de Ejecución:** `D:\workspace\PVS\Proyecto\qolqe-wallet`
 
-> Este documento centraliza todos los comandos necesarios para ejecutar, depurar y generar reportes de las suites de prueba de **Playwright**, **Schemathesis** y **Karate**.  
-> **Uso:** Esta guía se mantendrá actualizada a medida que se incorporen nuevas pruebas, herramientas o configuraciones al proyecto.
+---
+
+## 📋 ÍNDICE RÁPIDO
+1. [Preparación del Entorno (Prerrequisitos)](#1-preparación-del-entorno-prerrequisitos)
+2. [Los 4 Quality Gates Automatizados (Compuertas de Calidad)](#2-los-4-quality-gates-automatizados-compuertas-de-calidad)
+3. [Playwright: Pruebas de API y Reglas Financieras](#3-playwright-pruebas-de-api-y-reglas-financieras)
+4. [Playwright: Pruebas Web E2E y Regresión Visual](#4-playwright-pruebas-web-e2e-y-regresión-visual)
+5. [Qase.io: Sincronización y Trazabilidad en la Nube (TestOps)](#5-qaseio-sincronización-y-trazabilidad-en-la-nube-testops)
+6. [Grafana k6: Pruebas de Rendimiento y SLAs](#6-grafana-k6-pruebas-de-rendimiento-y-slas)
+7. [Schemathesis: Pruebas de Contrato OpenAPI](#7-schemathesis-pruebas-de-contrato-openapi)
+8. [GitHub Actions: Ejecución Manual y Pipelines](#8-github-actions-ejecución-manual-y-pipelines)
+9. [Tabla Resumen (Cheat Sheet Rápido)](#9-tabla-resumen-cheat-sheet-rápido)
 
 ---
 
 ## 1. Preparación del Entorno (Prerrequisitos)
 
-Antes de ejecutar las pruebas, asegúrate de tener el entorno preparado dentro de la carpeta `qolqe-wallet`:
+Antes de ejecutar cualquier comando, asegúrate de estar dentro de la carpeta `qolqe-wallet`:
 
 ```powershell
-# 1. Crear y activar entorno virtual de Python (3.11 o 3.12)
-py -m venv .venv
+cd D:\workspace\PVS\Proyecto\qolqe-wallet
+```
+
+### 1.1. Activar Entorno Virtual de Python (Backend y Contrato)
+```powershell
+# En Windows PowerShell:
 .\.venv\Scripts\Activate.ps1
 
-# 2. Instalar dependencias de desarrollo y contrato
+# Si no existe el entorno:
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
 pip install -r requirements-dev.txt -r requirements-contract.txt
+```
 
-# 3. Instalar dependencias de Node.js y navegadores de Playwright
+### 1.2. Instalar Dependencias de Node.js y Navegadores Playwright
+```powershell
 npm ci
 npx playwright install chromium
 ```
 
 ---
 
-## 2. Playwright (Automatización Activa: API y Web E2E)
+## 2. Los 4 Quality Gates Automatizados (Compuertas de Calidad)
 
-Playwright gestiona automáticamente el ciclo de vida del servidor de pruebas (`scripts/servidor_pruebas.py` en `http://127.0.0.1:8011`).
+Estos comandos ejecutan y evalúan los criterios de aprobación exactos definidos en la rúbrica y en el pipeline de CI/CD:
 
-### 2.1. Ejecución General
-| Comando | Función |
-|---|---|
-| `npm test` | Ejecuta **todas** las pruebas (API y Web E2E) usando el navegador Chromium configurado. |
-| `npm run test:api` | Ejecuta exclusivamente las pruebas de API (`tests/api/**/*.spec.js`). |
-| `npm run gate:api` | Evalúa el **Quality Gate 2** (cobertura funcional/técnica de API y matriz de defectos conocidos). |
-| `npm run test:e2e` | Ejecuta exclusivamente las pruebas Web E2E de interfaz (`tests/e2e/**/*.spec.js`). |
-| `npm run gate:web` | Evalúa el **Quality Gate 3** (cobertura Web E2E del Módulo Común, Recargas y Regresión Visual). |
-| `npx playwright test tests/e2e/recargas.spec.js` | Ejecuta un archivo de prueba específico. |
+| Quality Gate | Herramienta | Comando npm | Qué evalúa |
+|---|---|---|---|
+| **Gate 1: Contrato** | Schemathesis | `npm run test:contract` | Levanta servidor temporal, valida conformidad de OpenAPI en `/api/recargas` con 20 ejemplos deterministas por endpoint y genera JUnit XML. |
+| **Gate 2: API** | Playwright API | `npm run gate:api` | Ejecuta los 71 casos de negocio, evalúa 64 aprobados y valida exactamente los 3 defectos conocidos (`DEF-03`, `DEF-04`, `DEF-05`). |
+| **Gate 3: Web E2E** | Playwright Web | `npm run gate:web` | Ejecuta los 17 escenarios Web en Chromium (6 Núcleo Común + 11 Recargas G1) y valida que no existan regresiones visuales. |
+| **Gate 4: Rendimiento** | Grafana k6 | `npm run test:perf:humo` | Valida conectividad y aserciones de SLAs bajo tráfico concurrente mínimo en CI/CD. |
 
 ---
 
-### 2.2. Filtros por Etiquetas, Reglas o Casos de Prueba
-Playwright permite filtrar escenarios mediante `--grep`:
+## 3. Playwright: Pruebas de API y Reglas Financieras
 
-| Comando | Función |
-|---|---|
-| `npx playwright test --grep "@HU-G1-01"` | Ejecuta solo las pruebas vinculadas a la Historia de Usuario 1. |
-| `npx playwright test --grep "@R-G1-02"` | Ejecuta solo las pruebas asociadas a la Regla de Negocio 2 (Bonos y límites). |
-| `npx playwright test --grep "CP-WEB-G1-01"` | Ejecuta únicamente el caso de prueba web `CP-WEB-G1-01`. |
-| `npx playwright test --grep-invert "@smoke"` | Ejecuta todas las pruebas **excepto** las que tengan el tag `@smoke`. |
+Playwright administra automáticamente el levantamiento del backend de pruebas (`scripts/servidor_pruebas.py` en `http://127.0.0.1:8011`).
 
----
+### 3.1. Ejecución de Pruebas de API
+```powershell
+# Ejecutar todas las pruebas de API
+npm run test:api
+# o directamente con Playwright:
+npx playwright test tests/api/recargas.spec.js
+```
 
-### 2.3. Pruebas de Regresión Visual (Screenshots)
-El proyecto cuenta con validación visual para el comprobante de recarga y el formulario de recarga:
+### 3.2. Filtros por Historias de Usuario, Reglas o Casos
+```powershell
+# Filtrar por Historia de Usuario (ej. HU-G1-01)
+npx playwright test tests/api/recargas.spec.js --grep "@HU-G1-01"
 
-| Comando | Función |
-|---|---|
-| `npx playwright test tests/e2e/recargas.spec.js` | Compara las pantallas actuales contra las líneas base guardadas en `tests/__snapshots__/`. Si hay discrepancias visuales (CSS, layout), la prueba falla. |
-| `npx playwright test --update-snapshots` (o `-u`) | **Actualiza o regenera** las imágenes de referencia canónicas si hubo un rediseño visual intencional. |
+# Filtrar por Regla de Negocio (ej. Bono del 5% R-G1-02)
+npx playwright test tests/api/recargas.spec.js --grep "@R-G1-02"
 
----
+# Ejecutar un caso crítico específico (ej. caso del bono en S/ 30)
+npx playwright test tests/api/recargas.spec.js --grep "CP-G1-19"
 
-### 2.4. Depuración y Modos Interactivos
-| Comando | Función |
-|---|---|
-| `npx playwright test --ui` | Abre la **interfaz gráfica interactiva de Playwright** (Time-Travel, árbol de componentes, inspección de selectores en vivo). |
-| `npx playwright test --debug` | Abre el **Playwright Inspector** paso a paso, permitiendo pausar la ejecución y depurar cada acción. |
-| `npx playwright test --headed` | Ejecuta las pruebas mostrando la ventana real del navegador (modo no-headless). |
-| `npx playwright show-trace <ruta-al-trace.zip>` | Abre el **Trace Viewer** para examinar la traza completa (red, consola, snapshots del DOM paso a paso). |
+# Ejecutar el caso del límite diario de 5 recargas
+npx playwright test tests/api/recargas.spec.js --grep "CP-G1-22"
+```
 
 ---
 
-### 2.5. Grabación de Video y Evidencias en Fallos
-* **Configuración activa:** `video: 'retain-on-failure'` y `screenshot: 'only-on-failure'` en `playwright.config.js`.
-* Cuando una prueba falla, Playwright guarda automáticamente:
-  - Video del fallo (`.webm`) en `reportes/playwright/resultados/`.
-  - Captura del momento del error (`.png`).
-  - Archivo de traza (`trace.zip`).
+## 4. Playwright: Pruebas Web E2E y Regresión Visual
+
+### 4.1. Ejecución General Web
+```powershell
+# Ejecutar todos los 17 escenarios Web E2E (Modo Headless)
+npm run test:e2e
+# o directamente:
+npx playwright test tests/e2e/
+```
+
+### 4.2. Ejecución con Navegador Visible (Modo Headed - Ideal para Sustentación)
+```powershell
+npx playwright test tests/e2e/recargas.spec.js --headed
+```
+
+### 4.3. Modo UI Interactivo (Time-Travel Debugger)
+```powershell
+# Abre la interfaz gráfica interactiva de Playwright
+npx playwright test --ui
+```
+
+### 4.4. Depuración Paso a Paso (Playwright Inspector)
+```powershell
+# Ejecuta deteniéndose en cada clic y aserción
+npx playwright test tests/e2e/recargas.spec.js --debug
+```
+
+### 4.5. Pruebas de Regresión Visual (Comparación de Snapshots)
+```powershell
+# Ejecuta y compara contra las capturas base en tests/__snapshots__/
+npx playwright test tests/e2e/recargas.spec.js --grep "Regresión visual"
+
+# Actualizar las imágenes base de referencia si cambió el diseño intencionalmente:
+npx playwright test tests/e2e/recargas.spec.js -u
+```
+
+### 4.6. Abrir Reportes de Playwright
+```powershell
+# Abre el reporte HTML interactivo generado en la última corrida
+npm run report
+# o directamente:
+npx playwright show-report reportes/playwright/html
+```
 
 ---
 
-### 2.6. Visualización de Reportes
-| Comando | Función |
-|---|---|
-| `npm run report` | Abre el reporte interactivo en HTML (`reportes/playwright/html/index.html`). |
-| Archivo: `reportes/playwright/junit.xml` | Reporte en formato XML estándar para integración continua (CI). |
-| Archivo: `reportes/playwright/trazabilidad.json` | Matriz que vincula cada `CP`, `HU`, regla de negocio, duración y estado con el pipeline. |
+## 5. Qase.io: Sincronización y Trazabilidad en la Nube (TestOps)
+
+Qase.io centraliza los 98 casos de prueba organizados en 3 suites y almacena la multiejecución histórica.
+
+### 5.1. Variables de Entorno de Qase
+El proyecto ya cuenta con el token de API preconfigurado en `scripts/qase_sync.js`. Si deseas definirlo explícitamente en tu consola:
+```powershell
+$env:QASE_TESTOPS_API_TOKEN = "108a30d1577b504d18bafd40e002c724c36b2871d37e6a4a1f2f74b08edc2f39"
+$env:QASE_TESTOPS_PROJECT = "QOLQE"
+```
+
+### 5.2. Sincronizar Casos y Registrar Multiejecución en Qase.io
+Este script crea automáticamente las suites, publica los 98 casos y genera las 2 corridas históricas (Run 2: Detección vs Run 3: Regresión Final):
+```powershell
+npm run qase:sync
+# o con Node:
+node scripts/qase_sync.js
+```
 
 ---
 
-## 3. Schemathesis (Pruebas de Contrato y Fuzzing de API)
+## 6. Grafana k6: Pruebas de Rendimiento y SLAs
 
-Schemathesis valida que la implementación de la API cumpla fielmente con el esquema OpenAPI (`openapi.json`), generando automáticamente casos de prueba negativos, tipos de datos límite y combinaciones de entrada para detectar fallos no contemplados en endpoints `/api/recargas`.
+La suite de rendimiento está ubicada en `tests/performance/scenarios/` y modela el tráfico de la **Campaña Quincena Qolqe**.
 
-### 3.1. Ejecución Automatizada
-El script `scripts/contrato.py` levanta una instancia temporal del servidor en el puerto `8012`, reinicia los datos, obtiene un token JWT válido, ejecuta Schemathesis y apaga el servidor al terminar:
+> **Nota:** Para ejecutar k6 localmente, inicia previamente el backend de pruebas en una terminal separada si no está levantado:
+> ```powershell
+> .\.venv\Scripts\python.exe -m uvicorn qolqe.main:app --host 127.0.0.1 --port 8000
+> ```
+
+### 6.1. Ejecución de Escenarios k6
+```powershell
+# 1. Prueba de Humo (Smoke Test: 2 VUs, 15 segundos)
+npm run test:perf:humo
+# o: k6 run tests/performance/scenarios/humo_validacion.js
+
+# 2. Prueba de Carga Hora Punta (Load Test: 100 VUs, 9 minutos)
+npm run test:perf:carga
+# o: k6 run tests/performance/scenarios/carga_hora_punta.js
+
+# 3. Prueba de Pico de Campaña (Spike Test: 300 VUs repentinos)
+npm run test:perf:pico
+# o: k6 run tests/performance/scenarios/pico_campana.js
+
+# 4. Prueba de Estrés y Capacidad Máxima (Stress Test: 200 -> 500 VUs)
+npm run test:perf:estres
+# o: k6 run tests/performance/scenarios/estres_campana.js
+```
+
+### 6.2. Monitoreo y Gráficos de Recursos (CPU y RAM)
+Ubicados en `tests/performance/`:
+```powershell
+# Registrar consumo de CPU/RAM en segundo plano durante una prueba
+.\.venv\Scripts\python.exe tests/performance/monitor_recursos.py --duracion 60 --salida tests/performance/resultados/recursos_prueba.csv
+
+# Generar gráfico PNG de telemetría a partir del CSV
+.\.venv\Scripts\python.exe tests/performance/graficar_recursos.py tests/performance/resultados/recursos_carga.csv tests/performance/resultados/grafico_carga.png
+```
+
+---
+
+## 7. Schemathesis: Pruebas de Contrato OpenAPI
+
+Valida automáticamente el contrato de la API contra `openapi.json` con property-based testing:
 
 ```powershell
-# Opción 1: A través del script de npm
+# Opción automatizada (levanta servidor en puerto 8012 y genera JUnit XML):
 npm run test:contract
-
-# Opción 2: Directamente con el intérprete de Python del entorno
-python scripts/contrato.py
-# O en Windows:
+# o con Python:
 .\.venv\Scripts\python.exe scripts/contrato.py
 ```
 
-### 3.2. Ejecución Manual Directa por CLI
-Si el servidor ya está corriendo manualmente en `http://127.0.0.1:8012`:
+---
 
-```powershell
-schemathesis run http://127.0.0.1:8012/openapi.json `
-  --include-path-regex "^/api/recargas(?:/.*)?$" `
-  --header "Authorization: Bearer <TU_TOKEN_AQUI>" `
-  --max-examples 20 `
-  --seed 5383 `
-  --report junit `
-  --report-junit-path reportes/contrato/junit.xml
-```
+## 8. GitHub Actions: Ejecución Manual y Pipelines
 
-* **Explicación de parámetros:**
-  - `--include-path-regex`: Limita las pruebas a las rutas bajo `/api/recargas`.
-  - `--header`: Proporciona la cabecera de autorización Bearer.
-  - `--max-examples 20`: Genera 20 ejemplos de prueba por cada operación.
-  - `--seed 5383`: Garantiza que la generación de datos sea 100% determinista y reproducible.
-  - `--report junit`: Exporta el reporte a `reportes/contrato/junit.xml`.
+Para ejecutar el pipeline en la nube o mostrarlo en vivo durante la sustentación:
+
+1. Ingresa a: [https://github.com/Yoselyn214/qolqe-wallet/actions](https://github.com/Yoselyn214/qolqe-wallet/actions)
+2. Selecciona el workflow: **`Automatización de Pruebas - Qolqe Wallet (G1 Recargas)`**.
+3. Haz clic en el botón gris **Run workflow**:
+   - Casilla marcada (por defecto): Genera reportes completos con capturas, videos y trazas ZIP.
+   - Casilla desmarcada: Realiza una pasada ultrarrápida sin artefactos pesados.
+4. Al terminar la ejecución:
+   - Revisa el grafo secuencial de los 4 jobs (`contrato` → `pruebas-api` → `pruebas-web` → `rendimiento`).
+   - Revisa la tabla del **Step Summary** al pie de la página con los Quality Gates en verde.
+   - Descarga los artefactos generados en la sección **Artifacts** (`evidencia-contrato`, `evidencia-api`, `evidencia-web`, `evidencia-rendimiento`).
 
 ---
 
-## 4. Karate (Pruebas BDD / API - Referencia Histórica)
+## 9. Tabla Resumen (Cheat Sheet Rápido)
 
-Karate contiene la suite histórica de 71 escenarios de la primera entrega definidos en `features/api.feature`. Requiere Java 21+ y Karate standalone (`karate-2.0.0.jar`).
-
-### 4.1. Preparación previa
-Descargar el JAR de Karate (solo una vez):
-```powershell
-New-Item -ItemType Directory -Force .tools | Out-Null
-Invoke-WebRequest -Uri "https://github.com/karatelabs/karate/releases/download/v2.0.0/karate-2.0.0.jar" -OutFile ".tools\karate-2.0.0.jar"
-```
-
-### 4.2. Terminal 1: Iniciar API dedicada (puerto 8001)
-```powershell
-New-Item -ItemType Directory -Force datos | Out-Null
-$env:QOLQE_BD = Join-Path (Get-Location).Path "datos\karate-windows.db"
-$env:QOLQE_MODO_PRUEBA = "1"
-.\.venv\Scripts\python.exe -m uvicorn qolqe.main:app --host 127.0.0.1 --port 8001
-```
-
-### 4.3. Terminal 2: Comandos de ejecución de Karate
-Desde la raíz del proyecto, inicializa las variables y posiciónate en `tests/karate`:
-```powershell
-$raiz = (Get-Location).Path
-$jar = Join-Path $raiz ".tools\karate-2.0.0.jar"
-$reporte = Join-Path $raiz "reportes\karate"
-$feature = Join-Path $raiz "features\api.feature"
-Set-Location (Join-Path $raiz "tests\karate")
-```
-
-| Comando | Función |
+| Qué quieres probar | Comando exacto |
 |---|---|
-| `java "-DbaseUrl=http://127.0.0.1:8001" -jar "$jar" run --threads 1 --output "$reporte" --tags @recargas . "$feature"` | Ejecuta solo los escenarios de recargas. |
-| `java "-DbaseUrl=http://127.0.0.1:8001" -jar "$jar" run --threads 1 --output "$reporte" . "$feature"` | Ejecuta toda la suite (salud, autenticación y recargas). |
-| `java "-DbaseUrl=http://127.0.0.1:8001" -jar "$jar" run --threads 1 --output "$reporte" --tags @R-G1-02 . "$feature"` | Filtra por una regla específica (ej. `@R-G1-02`). |
-| `java "-DbaseUrl=http://127.0.0.1:8001" -jar "$jar" run --threads 1 --output "$reporte" --tags @recargas --name "Saldo insuficiente" . "$feature"` | Busca y ejecuta un escenario por nombre. |
-| `Start-Process (Join-Path $reporte "karate-summary.html")` | Abre el reporte HTML generado por Karate. |
-
-> [!IMPORTANT]
-> Mantén siempre `--threads 1`: los escenarios comparten base de datos y control de reloj; la ejecución en paralelo corrompería las aserciones de saldo y límites.
-
----
-
-## 5. Tabla Resumen Rápida (Cheat Sheet)
-
-| Herramienta | Objetivo | Comando Rápido |
-|---|---|---|
-| **Playwright** | Ejecutar todo | `npm test` |
-| **Playwright** | Solo API (funcional + técnica) | `npm run test:api` |
-| **Quality Gate** | Evaluar Quality Gate 2 (API) | `npm run gate:api` |
-| **Playwright** | Solo Web E2E (Común + Recargas) | `npm run test:e2e` |
-| **Quality Gate** | Evaluar Quality Gate 3 (Web E2E) | `npm run gate:web` |
-| **Playwright** | Modo Interactivo UI | `npx playwright test --ui` |
-| **Playwright** | Depurador paso a paso | `npx playwright test --debug` |
-| **Playwright** | Actualizar screenshots | `npx playwright test --update-snapshots` |
-| **Playwright** | Ver reporte HTML | `npm run report` |
-| **Schemathesis** | Pruebas de contrato (Quality Gate 1) | `npm run test:contract` |
-| **Karate** | Recargas API | `java -DbaseUrl=... -jar karate-2.0.0.jar run --threads 1 --tags @recargas . features/api.feature` |
-| **Karate** | Ver reporte | `Start-Process reportes/karate/karate-summary.html` |
+| **Probar todo (API + Web)** | `npm test` |
+| **Compuerta 1: Contrato OpenAPI** | `npm run test:contract` |
+| **Compuerta 2: Reglas de Negocio API** | `npm run gate:api` |
+| **Compuerta 3: Interfaz Web E2E** | `npm run gate:web` |
+| **Compuerta 4: Rendimiento k6 (Humo)** | `npm run test:perf:humo` |
+| **Rendimiento: Carga Hora Punta (100 VUs)** | `npm run test:perf:carga` |
+| **Rendimiento: Pico de Campaña (300 VUs)** | `npm run test:perf:pico` |
+| **Rendimiento: Estrés Máximo (500 VUs)** | `npm run test:perf:estres` |
+| **Ver Web con Navegador Abierto (Headed)** | `npx playwright test tests/e2e/ --headed` |
+| **Playwright Modo Interactivo (UI)** | `npx playwright test --ui` |
+| **Ver Reporte HTML de Playwright** | `npm run report` |
+| **Sincronizar Casos y Corridas con Qase.io** | `npm run qase:sync` |
+| **Filtrar por Caso Crítico en API** | `npx playwright test tests/api/ --grep "CP-G1-19"` |
+| **Verificar Regresión Visual** | `npx playwright test tests/e2e/ --grep "Regresión visual"` |
